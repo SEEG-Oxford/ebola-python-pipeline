@@ -4,6 +4,7 @@ __author__ = 'andrew.schofield@tessella.com'
 
 import model.whorequestobject
 import urllib2
+import csv
 
 BASE_URL = 'http://apps.who.int/gho/athena/xmart/'
 
@@ -36,3 +37,6 @@ class WHODataExtractor(object):
 
     def downloadfromwhowebsite(self):
         return urllib2.urlopen(self.urlconstructor())
+
+    def parsefile(self, csvfile):
+        reader = csv.DictReader(csvfile)
