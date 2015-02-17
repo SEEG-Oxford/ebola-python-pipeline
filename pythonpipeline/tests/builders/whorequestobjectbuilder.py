@@ -6,7 +6,6 @@ class whorequestobjectbuilder(object):
     requestobject = None
     def __init__(self):
         self.requestobject = model.whorequestobject.WHORequestObject()
-        return self
 
     def withformat(self, format):
         self.requestobject.format = format
@@ -38,6 +37,10 @@ class whorequestobjectbuilder(object):
 
     def withindicatortypes(self, indicatortypes):
         self.requestobject.indicatortype = indicatortypes
+        return self
+
+    def withsex(self, sex):
+        self.requestobject.sex = sex
         return self
 
     def build(self):

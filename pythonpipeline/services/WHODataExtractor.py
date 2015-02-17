@@ -12,7 +12,7 @@ class WHODataExtractor(object):
 
     def urlconstructor(self):
         targetcolumns = ','.join(self.requestobject.targetcolumns)
-        filterlist = str.format("{0}{1}{2}{3}{4}",
+        filterlist = str.format("{0}{1}{2}{3}SEX:{4}",
                                 self.formatlist("COUNTRY", self.requestobject.countries),
                                 self.formatlist("LOCATION", self.requestobject.location),
                                 self.formatlist("DATAPACKAGEID", self.requestobject.datapackageid),
