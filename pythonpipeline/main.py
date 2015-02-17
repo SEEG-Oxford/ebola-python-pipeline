@@ -1,6 +1,6 @@
 __author__ = 'andrew.schofield@tessella.com'
 
-import model.whorequestobject
+import model.WHORequestObject
 import services.WHODataExtractor
 
 
@@ -9,7 +9,7 @@ class Pipeline(object):
         self.whodataextractor = None
 
     def main(self):
-        requestobject = model.whorequestobject.WHORequestObject()
+        requestobject = model.WHORequestObject.WHORequestObject()
         requestobject.format = "data-text.csv"
         requestobject.target = "EBOLA_MEASURE"
         requestobject.targetcolumns = ["CASES", "DEATHS"]

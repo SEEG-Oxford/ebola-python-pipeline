@@ -1,11 +1,12 @@
 __author__ = 'andrew.schofield@tessella.com'
 
-import model.whorequestobject
+import model.WHORequestObject
 
-class whorequestobjectbuilder(object):
+
+class WHORequestObjectBuilder(object):
     requestobject = None
     def __init__(self):
-        self.requestobject = model.whorequestobject.WHORequestObject()
+        self.requestobject = model.WHORequestObject.WHORequestObject()
 
     def withformat(self, format):
         self.requestobject.format = format
