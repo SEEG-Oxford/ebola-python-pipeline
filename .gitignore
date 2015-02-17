@@ -2,3 +2,5 @@ workspace.xml
 tasks.xml
 **/dictionaries/*
 *.pyc
+.coverage
+download.file
