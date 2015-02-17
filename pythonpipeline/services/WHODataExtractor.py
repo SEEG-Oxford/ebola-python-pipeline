@@ -40,3 +40,4 @@ class WHODataExtractor(object):
 
     def parsefile(self, csvfile):
         reader = csv.DictReader(csvfile)
+        #TODO: Find unique countries, then parse the file as a set of WHOMeasure objects
