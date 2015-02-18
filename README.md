@@ -1,7 +1,7 @@
 # Ebola Modelling Pipeline
-## Python scripts and modules to automate downlading up-to-date Ebola data and statistics, preprocessing and handing off to predictive models using observed movement data.
+## Python scripts and modules to automate downloading up-to-date Ebola data and statistics, preprocessing and handing off to predictive models using observed movement data.
 
-### Contributers
+### Contributors
 
 Andrew Schofield @ [Tessella][tessella]
 
