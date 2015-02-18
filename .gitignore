@@ -4,3 +4,5 @@ tasks.xml
 *.pyc
 .coverage
 download.file
+pythonpipeline/Rplots.pdf
+*.csv
