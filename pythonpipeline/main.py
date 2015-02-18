@@ -9,22 +9,27 @@ class Pipeline(object):
         self.whodataextractor = None
 
     def main(self):
+        self.downloadforcountry("GIN")
+        #self.downloadforcountry("LBR")
+        #self.downloadforcountry("SLE")
+
+    def downloadforcountry(self, countryname):
         requestobject = model.WHORequestObject.WHORequestObject()
-        requestobject.format = "data-text.csv"
+        requestobject.format = "data-verbose.csv"
         requestobject.target = "EBOLA_MEASURE"
-        requestobject.targetcolumns = ["CASES", "DEATHS"]
-        requestobject.profile = "text"
-        requestobject.countries = ["GIN", "UNSPECIFIED", "LBR", "UNSPECIFIED", "SLE", "UNSPECIFIED"]
-        requestobject.location = ["-"]
-        requestobject.datapackageid = ["2014-11-14"]
-        requestobject.indicatortype = ["SITREP_CUMULATIVE", "SITREP_CUMULATIVE_21_DAYS"]
+        requestobject.targetcolumns = ["CASES"]
+        requestobject.profile = "verbose"
+        requestobject.countries = [countryname]
+        requestobject.location = ["*"]
+        requestobject.datapackageid = ["2015-02-11"]
+        requestobject.indicatortype = ["SITREP_NEW"]
         requestobject.sex = "-"
 
         self.whodataextractor = services.WHODataExtractor.WHODataExtractor(requestobject)
 
         data = self.whodataextractor.downloadfromwhowebsite()
 
-        with open("download.file", "w") as file:
+        with open(countryname + ".csv", "w") as file:
             file.write(data.read())
             file.close()
 
