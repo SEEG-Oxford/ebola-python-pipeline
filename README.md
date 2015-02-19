@@ -4,7 +4,7 @@
 ### Example usage
 
 ```
-python ebola-pipeline.py -d 2015-02-11 -r R_Code\import_EVD_case_data.R -o c:\temp
+python ebola-pipeline.py -r R_Code\import_EVD_case_data.R -o c:\temp
 ```
 
 

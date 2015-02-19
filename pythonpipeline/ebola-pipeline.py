@@ -58,7 +58,6 @@ class Pipeline(object):
             file.write(data.read())
             file.close()
 
-
     def findlatestavailabledateforcountry(self, country):
         date = None
         data = urllib2.urlopen("http://apps.who.int/gho/data/node.ebola-sitrep.ebola-country-" + country + "-latest?lang=en")
