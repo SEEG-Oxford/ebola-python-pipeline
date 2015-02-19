@@ -35,7 +35,6 @@ class Pipeline(object):
         self.downloadforcountry("GIN", date, outputdir)
         self.downloadforcountry("LBR", date, outputdir)
         self.downloadforcountry("SLE", date, outputdir)
-        self.downloadforcountry("SLE", date, outputdir)
 
         # windows specific at the moment
         # need to replace with a platform agnostic call to run R
