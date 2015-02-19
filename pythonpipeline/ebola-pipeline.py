@@ -36,9 +36,8 @@ class Pipeline(object):
         self.downloadforcountry("LBR", date, outputdir)
         self.downloadforcountry("SLE", date, outputdir)
 
-        # windows specific at the moment
-        # need to replace with a platform agnostic call to run R
-        output = call(["C:\\Program Files\\R\\R-3.1.2\\bin\\R.exe", "--no-save", "--file=" + os.path.abspath(rsourcefile)], cwd=outputdir)
+        # as long as R is on your path this should work
+        output = call(["R", "--silent", "--slave", "--vanilla", "--file=" + os.path.abspath(rsourcefile)], cwd=outputdir)
 
     def downloadforcountry(self, countryname, date, outputdir):
         requestobject = model.WHORequestObject.WHORequestObject()
