@@ -19,11 +19,11 @@ class Pipeline(object):
         try:
             opts, args = getopt.getopt(argv, "hd:r:o:", ["date=", "rfile=", "outputdir="])
         except getopt.GetoptError:
-            print 'main.py -d <date> -r <R source filename> -o <output directory>'
+            print 'ebola-pipeline.py -d <date> -r <R source filename> -o <output directory>'
             sys.exit(2)
         for opt, arg in opts:
             if opt == '-h':
-                print 'main.py -d <date> -r <R source filename> -o <output directory>'
+                print 'ebola-pipeline.py -d <date> -r <R source filename> -o <output directory>'
                 sys.exit()
             elif opt in ("-d", "--date"):
                 date = arg
