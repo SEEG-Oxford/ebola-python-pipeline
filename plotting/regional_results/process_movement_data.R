@@ -1,5 +1,5 @@
 # n= number of weeks data to read from the end of the file
-casedata <- colSums(tail(read.csv('../data/EVD_conf_prob_.csv'),n=3)[,-1])
+allcasedata <- read.csv('../data/EVD_conf_prob_.csv')
 
 # helper function
 as.movementmatrix <- function(dataframe) {
@@ -20,7 +20,9 @@ as.movementmatrix <- function(dataframe) {
 }
 
 # pull out origin, destination and radiation with selection_france
-getData <- function(column) {
+getData <- function(column, startWeek) {
+	endWeek <- startWeek+2
+	casedata <- colSums(allcasedata[c(startWeek:endWeek),][,-1])
 	all_crd <- read.csv('../data/all_cdr_europe.csv')[,c(1,2,column)]
 
 	raw_movement_matrix <- as.movementmatrix(all_crd)

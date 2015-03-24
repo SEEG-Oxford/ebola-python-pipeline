@@ -86,19 +86,40 @@ districts <- shapefile('ad2_FINAL.shp')
 countries <- shapefile('countries_wa.shp')
 country_borders <- shapefile('country_borders_wa.shp')
 
+# get total number of weeks of data
+totalWeeks <- nrow(allcasedata)
+mostRecent <- totalWeeks - 2
+
 # 9 is france/radiation-with-selection
-riskdata <- getData(9)
+riskdata <- getData(9, mostRecent)
 plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using radiation with selection model", "regional_prediction_radsel_france")
 
 # 6 is france/radiation
-riskdata <- getData(6)
+riskdata <- getData(6, mostRecent)
 plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using original radiation model", "regional_prediction_radiation_france")
 
 # 3 is france/gravity
-riskdata <- getData(3)
+riskdata <- getData(3, mostRecent)
 plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using gravity model", "regional_prediction_gravity_france")
 
 # 12 is france/uniform
-riskdata <- getData(12)
+riskdata <- getData(12, mostRecent)
 plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using uniform selection model", "regional_prediction_uniform_france")
 
+for(idx in 1:mostRecent) {
+	# 9 is france/radiation-with-selection
+	riskdata <- getData(9, idx)
+	plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using radiation with selection model", paste("historical/regional_prediction_radsel_france_week", idx, sep="_"))
+
+	# 6 is france/radiation
+	riskdata <- getData(6, idx)
+	plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using original radiation model", paste("historical/regional_prediction_radiation_france_week", idx, sep="_"))
+
+	# 3 is france/gravity
+	riskdata <- getData(3, idx)
+	plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using gravity model", paste("historical/regional_prediction_gravity_france_week", idx, sep="_"))
+
+	# 12 is france/uniform
+	riskdata <- getData(12, idx)
+	plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using uniform selection model", paste("historical/regional_prediction_uniform_france_week", idx, sep="_"))
+}
