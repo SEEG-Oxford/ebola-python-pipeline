@@ -42,8 +42,12 @@ getData <- function(column) {
 	districtNames <- gsub("\\s", "_", districtNames)
 	districtNames <- gsub("'", "_", districtNames)
 
-	# Correct names of certain regions
+	# Correct names of certain regions which are different in the shapefile
 	districtNames <- gsub("RIVER_GEE", "RIVER_GHEE", districtNames)
+	districtNames <- gsub("CIV_GBEKE", "CIV_GBÊKE", districtNames)
+	districtNames <- gsub("CIV_GBOKLE", "CIV_GBÔKLE", districtNames)
+	districtNames <- gsub("CIV_GOH", "CIV_GÔH", districtNames)
+	districtNames <- gsub("CIV_LOH_DJIBOUA", "CIV_LÔH_DJIBOUA", districtNames)
 
 
 	names(summedRegions) <- districtNames
@@ -55,7 +59,7 @@ getData <- function(column) {
 	reportedNames <- gsub("'", "_", reportedNames)
 	reportedNames <- gsub("[.]", "_", reportedNames)
 
-	# Correct names of certain regions
+	# Correct names of certain regions which are different in the core dataset
 	reportedNames <- gsub("RIVER_GEE", "RIVER_GHEE", reportedNames)
 	names(reportedCases) <- reportedNames
 
