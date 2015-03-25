@@ -42,7 +42,7 @@ plotMap <- function (vals,
   countryColors[grep("LBR|GIN|SLE", countries$admin0_COU)] <- "#33D3FF"
   
   par(mar=c(1,1,2,2))
-  plot(all_countries, col = grey(0.9))
+  plot(all_countries[-9,], col = grey(0.9))
   plot(countries, col = countryColors, border = 'black', lwd = 1,add=TRUE)
   vertical.image.legend(col=seqRamp('YlOrRd')(1000),zlim=c(0,1))
   title(main=maptitle)
