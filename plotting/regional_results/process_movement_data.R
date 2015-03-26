@@ -1,6 +1,11 @@
 source("AUC.R")
 # n= number of weeks data to read from the end of the file
 allcasedata <- read.csv('../data/EVD_conf_prob_.csv')
+# this must be exactly the same format as allcasedata and will also need curating
+# when cases move from the sitrep to the patientdb
+additionalcasedata <- read.csv('../data/EVD_conf_prob_additional.csv')
+
+allcasedata <- allcasedata + additionalcasedata
 
 # helper function
 as.movementmatrix <- function(dataframe) {
