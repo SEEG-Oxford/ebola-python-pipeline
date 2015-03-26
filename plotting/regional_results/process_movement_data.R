@@ -1,3 +1,4 @@
+source("AUC.R")
 # n= number of weeks data to read from the end of the file
 allcasedata <- read.csv('../data/EVD_conf_prob_.csv')
 
@@ -20,7 +21,7 @@ as.movementmatrix <- function(dataframe) {
 }
 
 # pull out origin, destination and radiation with selection_france
-getData <- function(column, startWeek) {
+getData <- function(column, startWeek, name, auc=TRUE) {
 	endWeek <- startWeek+2
 	casedata <- colSums(allcasedata[c(startWeek:endWeek),][,-1])
 	all_crd <- read.csv('../data/all_cdr_europe.csv')[,c(1,2,column)]
@@ -67,5 +68,24 @@ getData <- function(column, startWeek) {
 
 	predictedRegions <- summedRegions[!(names(summedRegions) %in% names(reportedCases))]
 	predictedRegions = predictedRegions / max(predictedRegions)
-	return (list(reportedCases=reportedCases, predictedRegions=predictedRegions))
+	# these are the regions we have case data for, so we want to see how accurate the predictions are
+	write.csv(t(summedRegions[grep("GIN|LBR|SLE", names(summedRegions))]), paste("historical/data/risk_week", startWeek, name, ".csv", sep="_"))
+	
+	if(auc) {
+		# calculate AUC
+		# select the week being predicted
+		weekbeingpredicted <- allcasedata[endWeek+1,][,-1]
+		# make it logical (either there are cases or not)
+		weekbeingpredicted[weekbeingpredicted > 0] <- 1
+		
+		# remove regions where the are already cases to prevent skewing the data
+		weekbeingpredicted <- weekbeingpredicted[!(names(weekbeingpredicted) %in% names(reportedCases))]
+		
+		predictions <- summedRegions[grep("GIN|LBR|SLE", names(summedRegions))]
+		predictions <- predictions[!(names(predictions) %in% names(reportedCases))]
+		
+		AUC <- AUC(data.frame(weekbeingpredicted), data.frame(predictions),plot=FALSE,error_bars=FALSE,ci=0.95,res=100,main=name)
+	}
+	
+	return (list(reportedCases=reportedCases, predictedRegions=predictedRegions, AUC=AUC))
 }

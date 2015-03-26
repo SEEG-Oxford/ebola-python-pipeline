@@ -5,6 +5,8 @@ require(raster)
 require(SDMTools)
 require(rgdal)
 require(aqfig)
+require(foreach)
+require(doParallel)
 source('palettes.R')
 source('process_movement_data.R')
 
@@ -86,40 +88,111 @@ districts <- shapefile('ad2_FINAL.shp')
 countries <- shapefile('countries_wa.shp')
 country_borders <- shapefile('country_borders_wa.shp')
 
+
+# the prediction models used
+predictionModelNames <- c("France Gravity", "France Original Radiation", "France Radiation With Selection", "France Uniform Selection","Portugal Gravity", "Portugal Original Radiation", "Portugal Radiation With Selection", "Portugal Uniform Selection","Spain Gravity", "Spain Original Radiation", "Spain Radiation With Selection", "Spain Uniform Selection")
+
 # get total number of weeks of data
 totalWeeks <- nrow(allcasedata)
-mostRecent <- totalWeeks - 2
+# In order to calculate the AUC we need to not include the last week in the prediction
+mostRecent <- totalWeeks - 3
 
-# 9 is france/radiation-with-selection
-riskdata <- getData(9, mostRecent)
-plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using radiation with selection model", "regional_prediction_radsel_france")
-
-# 6 is france/radiation
-riskdata <- getData(6, mostRecent)
-plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using original radiation model", "regional_prediction_radiation_france")
+# For the current state we need to +1 the mostRecent value as we are wanting
+# to create risk data for the coming week (i.e. predict the future) rather
+# than comparing the predicted risk with the known data for subsequent weeks
 
 # 3 is france/gravity
-riskdata <- getData(3, mostRecent)
+riskdata <- getData(3, mostRecent+1, "France Gravity", auc=FALSE)
 plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using gravity model", "regional_prediction_gravity_france")
 
+# 6 is france/radiation
+riskdata <- getData(6, mostRecent+1, "France Original Radiation", auc=FALSE)
+plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using original radiation model", "regional_prediction_radiation_france")
+
+# 9 is france/radiation-with-selection
+riskdata <- getData(9, mostRecent+1, "France Radiation with Selection", auc=FALSE)
+plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using radiation with selection model", "regional_prediction_radsel_france")
+
 # 12 is france/uniform
-riskdata <- getData(12, mostRecent)
+riskdata <- getData(12, mostRecent+1, "France Uniform", auc=FALSE)
 plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using uniform selection model", "regional_prediction_uniform_france")
 
-for(idx in 1:mostRecent) {
-	# 9 is france/radiation-with-selection
-	riskdata <- getData(9, idx)
-	plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using radiation with selection model", paste("historical/regional_prediction_radsel_france_week", idx, sep="_"))
 
-	# 6 is france/radiation
-	riskdata <- getData(6, idx)
-	plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using original radiation model", paste("historical/regional_prediction_radiation_france_week", idx, sep="_"))
+# cl <- makeCluster(8)
+# registerDoParallel(cl)
 
-	# 3 is france/gravity
-	riskdata <- getData(3, idx)
-	plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using gravity model", paste("historical/regional_prediction_gravity_france_week", idx, sep="_"))
 
-	# 12 is france/uniform
-	riskdata <- getData(12, idx)
-	plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using uniform selection model", paste("historical/regional_prediction_uniform_france_week", idx, sep="_"))
-}
+# aucmatrix <- foreach(idx=1:mostRecent,.combine=rbind) %dopar% {
+	# # we need to manually track the indices if using a parallel library
+	# aucresult <- vector()
+	# aucresult[1] <- idx
+	# # 3 is france/gravity
+	# riskdata <- getData(3, idx, predictionModelNames[1])
+# #	plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, #riskdata$reportedCases, "Regional relative risk of Ebola importation\n using gravity model", #paste("historical/plots/regional_prediction_gravity_france_week", idx, sep="_"))
+	# aucresult[2] <- riskdata$AUC
+
+	# # 6 is france/radiation
+	# riskdata <- getData(6, idx, predictionModelNames[2])
+# #	plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, #riskdata$reportedCases, "Regional relative risk of Ebola importation\n using original radiation model", #paste("historical/plots/regional_prediction_radiation_france_week", idx, sep="_"))
+	# aucresult[3] <- riskdata$AUC
+
+	# # 9 is france/radiation-with-selection
+	# riskdata <- getData(9, idx, predictionModelNames[3])
+# #	plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, #riskdata$reportedCases, "Regional relative risk of Ebola importation\n using radiation with selection #model", paste("historical/plots/regional_prediction_radsel_france_week", idx, sep="_"))
+	# aucresult[4] <- riskdata$AUC
+
+	# # 12 is france/uniform
+	# riskdata <- getData(12, idx, predictionModelNames[4])
+# #	plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, #riskdata$reportedCases, "Regional relative risk of Ebola importation\n using uniform selection model", #paste("historical/plots/regional_prediction_uniform_france_week", idx, sep="_"))
+	# aucresult[5] <- riskdata$AUC
+	
+	
+	# # 4 is portual/gravity
+	# riskdata <- getData(4, idx, predictionModelNames[5])
+# #	plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, #riskdata$reportedCases, "Regional relative risk of Ebola importation\n using gravity model", #paste("historical/plots/regional_prediction_gravity_portugal_week", idx, sep="_"))
+	# aucresult[6] <- riskdata$AUC
+
+	# # 7 is portual/radiation
+	# riskdata <- getData(7, idx, predictionModelNames[6])
+# #	plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, #riskdata$reportedCases, "Regional relative risk of Ebola importation\n using original radiation model", #paste("historical/plots/regional_prediction_radiation_portugal_week", idx, sep="_"))
+	# aucresult[7] <- riskdata$AUC
+
+	# # 10 is portual/radiation-with-selection
+	# riskdata <- getData(10, idx, predictionModelNames[7])
+# #	plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, #riskdata$reportedCases, "Regional relative risk of Ebola importation\n using radiation with selection #model", paste("historical/plots/regional_prediction_radsel_portugal_week", idx, sep="_"))
+	# aucresult[8] <- riskdata$AUC
+
+	# # 13 is portual/uniform
+	# riskdata <- getData(13, idx, predictionModelNames[8])
+# #	plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, #riskdata$reportedCases, "Regional relative risk of Ebola importation\n using uniform selection model", #paste("historical/plots/regional_prediction_uniform_portugal_week", idx, sep="_"))
+	# aucresult[9] <- riskdata$AUC
+	
+	
+	# # 5 is spain/gravity
+	# riskdata <- getData(5, idx, predictionModelNames[9])
+# #	plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, #riskdata$reportedCases, "Regional relative risk of Ebola importation\n using gravity model", #paste("historical/plots/regional_prediction_gravity_spain_week", idx, sep="_"))
+	# aucresult[10] <- riskdata$AUC
+
+	# # 8 is portual/radiation
+	# riskdata <- getData(8, idx, predictionModelNames[10])
+# #	plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, #riskdata$reportedCases, "Regional relative risk of Ebola importation\n using original radiation model", #paste("historical/plots/regional_prediction_radiation_spain_week", idx, sep="_"))
+	# aucresult[11] <- riskdata$AUC
+
+	# # 11 is portual/radiation-with-selection
+	# riskdata <- getData(11, idx, predictionModelNames[11])
+# #	plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, #riskdata$reportedCases, "Regional relative risk of Ebola importation\n using radiation with selection #model", paste("historical/plots/regional_prediction_radsel_spain_week", idx, sep="_"))
+	# aucresult[12] <- riskdata$AUC
+
+	# # 14 is portual/uniform
+	# riskdata <- getData(14, idx, predictionModelNames[12])
+# #	plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, #riskdata$reportedCases, "Regional relative risk of Ebola importation\n using uniform selection model", #paste("historical/plots/regional_prediction_uniform_spain_week", idx, sep="_"))
+	# aucresult[13] <- riskdata$AUC
+	
+	# aucresult
+# }
+# stopCluster(cl)
+
+
+# colnames(aucmatrix) <- c("Week index", predictionModelNames)
+
+# write.csv(aucmatrix, "aucdata.csv")
