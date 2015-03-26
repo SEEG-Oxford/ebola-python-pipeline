@@ -10,13 +10,13 @@ rm(list = ls())
 # new data by epi week and district, download csv (text and codes)
 
 # load guinea dataset
-guinea_raw <- read.csv('gin.csv',
+guinea_raw <- read.csv('GIN.csv',
                        stringsAsFactors = FALSE)
 
-liberia_raw <- read.csv('lbr.csv',
+liberia_raw <- read.csv('LBR.csv',
                         stringsAsFactors = FALSE)
 
-sierra_leone_raw <- read.csv('sle.csv',
+sierra_leone_raw <- read.csv('SLE.csv',
                         stringsAsFactors = FALSE)
 
 all_raw <- rbind(guinea_raw, liberia_raw, sierra_leone_raw)
@@ -64,13 +64,31 @@ for (i in 1:nweek) {
     district <- districts[j]
 
     # add in numbers for the relevant matrices
-    confirmed[i, j] <- all$number[all$week == week &
-                                           all$country_district == district &
-                                           all$case_type == 'CONFIRMED']
+    confirmedCase <- all$number[all$week == week &
+                                  all$country_district == district &
+                                  all$case_type == 'CONFIRMED']
+    # fix for broken WHO data were some districts are simply missing the CONFIRMED case count
+    if(length(confirmedCase) == 0) {
+      confirmedCase <- 0
+    }
+    cat(paste(week, district, confirmedCase,sep="-"),"\n")
+    
+    # fix for WHO data that have multiple copies of the same region for the CONFIRMED case count in a given week
+    # we assume the last one in the list is correct
+    confirmed[i, j] <- tail(confirmedCase,n=1)
 
-    probable[i, j] <- all$number[all$week == week &
-                                           all$country_district == district &
-                                           all$case_type == 'PROBABLE']
+    probableCase <- all$number[all$week == week &
+                                 all$country_district == district &
+                                 all$case_type == 'PROBABLE']
+    
+    # fix for broken WHO data were some districts are simply missing the PROBABLE case count
+    if(length(probableCase) == 0) {
+      probableCase <- 0
+    }
+    
+    # fix for WHO data that have multiple copies of the same region for the CONFIRMED case count in a given week
+    # we assume the last one in the list is correct
+    probable[i, j] <- tail(probableCase,n=1)
   }
 }
 
