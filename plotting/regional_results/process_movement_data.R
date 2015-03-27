@@ -79,7 +79,9 @@ getData <- function(column, startWeek, name, auc=TRUE) {
 	predictedRegions <- summedRegions[!(names(summedRegions) %in% names(reportedCases))]
 	predictedRegions = predictedRegions / max(predictedRegions)
 	# these are the regions we have case data for, so we want to see how accurate the predictions are
-	write.csv(t(summedRegions[grep("GIN|LBR|SLE", names(summedRegions))]), paste("historical/data/risk_week", startWeek, name, ".csv", sep="_"))
+	write.csv(t(summedRegions[grep("GIN|LBR|SLE", names(summedRegions))]), paste("historical/data/core_risk_week", startWeek, name, ".csv", sep="_"))
+	# these are the risks for the non-core regions
+	write.csv(t(predictedRegions), paste("historical/data/non-core_risk_week", startWeek, name, ".csv", sep="_"))
 	
 	if(auc) {
 		# calculate AUC
