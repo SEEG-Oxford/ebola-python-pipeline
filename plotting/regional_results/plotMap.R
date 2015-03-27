@@ -85,6 +85,12 @@ districts <- shapefile('ad2_FINAL.shp')
 countries <- shapefile('countries_wa.shp')
 country_borders <- shapefile('country_borders_wa.shp')
 
+# fix an error in districts where CIV has 2 regions named BELIER. One should be MORONOU
+dnames <- districts$NAME
+dnames[105] <- "MORONOU"
+districts$NAME <- dnames
+
+
 
 # the prediction models used
 predictionModelNames <- c("France Gravity", "France Original Radiation", "France Radiation With Selection", "France Uniform Selection","Portugal Gravity", "Portugal Original Radiation", "Portugal Radiation With Selection", "Portugal Uniform Selection","Spain Gravity", "Spain Original Radiation", "Spain Radiation With Selection", "Spain Uniform Selection")
