@@ -31,16 +31,13 @@ as.movementmatrix <- function(dataframe) {
 }
 
 # pull out origin, destination and radiation with selection_france
-getData <- function(column, startWeek, name, auc=TRUE) {
+getData <- function(raw_movement_matrix, startWeek, name, auc=TRUE) {
 	endWeek <- startWeek+2
 	casedata <- colSums(allcasedata[c(startWeek:endWeek),][,-1])
-	all_crd <- read.csv('../data/all_cdr_europe.csv')[,c(1,2,column)]
-
-	raw_movement_matrix <- as.movementmatrix(all_crd)
 
 	for(idx in 1:nrow(raw_movement_matrix)) {
 		nametofind <- gsub("\\s", ".", row.names(raw_movement_matrix)[idx])
-		casecount <- casedata[match(nametofind, names(casedata))]
+		casecount <- casedata[match(nametofind, gsub("[.]","_",names(casedata)))]
 		raw_movement_matrix[idx,] <- (raw_movement_matrix[idx,] * casecount)
 	}
 

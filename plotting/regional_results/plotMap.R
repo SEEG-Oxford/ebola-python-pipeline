@@ -105,19 +105,19 @@ mostRecent <- totalWeeks - 3
 # than comparing the predicted risk with the known data for subsequent weeks
 
 # 3 is france/gravity
-riskdata <- getData(3, mostRecent+1, "France Gravity", auc=FALSE)
+riskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,3)]), mostRecent+1, "France Gravity", auc=FALSE)
 plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using gravity model", "regional_prediction_gravity_france")
 
 # 6 is france/radiation
-riskdata <- getData(6, mostRecent+1, "France Original Radiation", auc=FALSE)
+riskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,6)]), mostRecent+1, "France Original Radiation", auc=FALSE)
 plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using original radiation model", "regional_prediction_radiation_france")
 
 # 9 is france/radiation-with-selection
-riskdata <- getData(9, mostRecent+1, "France Radiation with Selection", auc=FALSE)
+riskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,9)]), mostRecent+1, "France Radiation with Selection", auc=FALSE)
 plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using radiation with selection model", "regional_prediction_radsel_france")
 
 # 12 is france/uniform
-riskdata <- getData(12, mostRecent+1, "France Uniform", auc=FALSE)
+riskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,12)]), mostRecent+1, "France Uniform", auc=FALSE)
 plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using uniform selection model", "regional_prediction_uniform_france")
 
 
