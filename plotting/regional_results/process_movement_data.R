@@ -34,6 +34,24 @@ as.movementmatrix <- function(dataframe) {
 getData <- function(raw_movement_matrix, startWeek, name, auc=TRUE) {
 	endWeek <- startWeek+2
 	casedata <- colSums(allcasedata[c(startWeek:endWeek),][,-1])
+	
+	
+	## prepare the region names
+	districtNames <- names(casedata)
+
+	districtNames <- gsub("[.]", "_", districtNames)
+	districtNames <- gsub("\\s", "_", districtNames)
+	districtNames <- gsub("'", "_", districtNames)
+
+	# Correct names of certain regions which are different in the shapefile
+	districtNames <- gsub("LBR_RIVER_GEE", "LBR_RIVER_GHEE", districtNames)
+	districtNames <- gsub("CIV_GBEKE", "CIV_GBÊKE", districtNames)
+	districtNames <- gsub("CIV_GBOKLE", "CIV_GBÔKLE", districtNames)
+	districtNames <- gsub("CIV_GOH", "CIV_GÔH", districtNames)
+	districtNames <- gsub("CIV_LOH_DJIBOUA", "CIV_LÔH_DJIBOUA", districtNames)
+
+
+	names(casedata) <- districtNames
 
 	for(idx in 1:nrow(raw_movement_matrix)) {
 		nametofind <- gsub("\\s", ".", row.names(raw_movement_matrix)[idx])
