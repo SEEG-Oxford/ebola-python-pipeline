@@ -53,7 +53,7 @@ plotMap <- function (vals,
   title(main=plotTitle)  
 }
 
-plotRisks <- function(vals, districts, countries, country_borders, predictedRegions, reportedCases, plotTitle, filename) {
+plotRisks <- function(districts, countries, country_borders, predictedRegions, reportedCases, plotTitle, filename) {
 	vals <- rep(NA, nrow(districts))
 	for(idx in 1:length(predictedRegions)) {	
 		vals[match(names(predictedRegions[idx]), paste(districts$COUNTRY_ID,districts$NAME, sep='_'))] <- predictedRegions[idx]
@@ -109,23 +109,23 @@ west_africa_gravity <- read.csv('../data/gravity.csv')
 
 # 3 is france/gravity
 riskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,3)]), mostRecent+1, "France Gravity", auc=FALSE)
-plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using gravity model", "regional_prediction_gravity_france")
+plotRisks(districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using gravity model", "regional_prediction_gravity_france")
 
 # 6 is france/radiation
 riskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,6)]), mostRecent+1, "France Original Radiation", auc=FALSE)
-plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using original radiation model", "regional_prediction_radiation_france")
+plotRisks(districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using original radiation model", "regional_prediction_radiation_france")
 
 # 9 is france/radiation-with-selection
 riskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,9)]), mostRecent+1, "France Radiation with Selection", auc=FALSE)
-plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using radiation with selection model", "regional_prediction_radsel_france")
+plotRisks(districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using radiation with selection model", "regional_prediction_radsel_france")
 
 # 12 is france/uniform
 riskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,12)]), mostRecent+1, "France Uniform", auc=FALSE)
-plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using uniform selection model", "regional_prediction_uniform_france")
+plotRisks(districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using uniform selection model", "regional_prediction_uniform_france")
 
 # overall africa gravity model
 riskdata <- getData(as.movementmatrix(west_africa_gravity[,c(8,14,19)]), mostRecent+1, "West Africa Gravity", auc=FALSE)
-plotRisks(vals, districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using West Africa gravity model", "regional_prediction_gravity_west_africa")
+plotRisks(districts, countries, country_borders, riskdata$predictedRegions, riskdata$reportedCases, "Regional relative risk of Ebola importation\n using West Africa gravity model", "regional_prediction_gravity_west_africa")
 
 
 cl <- makeCluster(8)
