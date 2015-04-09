@@ -19,20 +19,26 @@ class Pipeline(object):
     def main(self, argv):
         rsourcefile = ''
         outputdir = ''
+        localfiles = False
         try:
-            opts, args = getopt.getopt(argv, "hr:o:", ["rfile=", "outputdir="])
+            opts, args = getopt.getopt(argv, "hlr:o:", ["rfile=", "outputdir="])
         except getopt.GetoptError:
-            print 'ebola-pipeline.py -r <R source filename> -o <output directory>'
+            print 'ebola-pipeline.py -r <R source filename> ' \
+                  '-o <output directory>'
             sys.exit(2)
         for opt, arg in opts:
             if opt == '-h':
-                print 'ebola-pipeline.py -r <R source filename> -o <output directory>'
+                print 'ebola-pipeline.py -r <R source filename> ' \
+                      '-o <output directory>'
                 sys.exit()
+            elif opt in ("-l"):
+                localfiles = True
             elif opt in ("-r", "--rfile"):
                 rsourcefile = arg
             elif opt in ("-o", "--outputdir"):
                 outputdir = arg
 
+        if not localfiles:
         self.downloadforcountry("GIN", outputdir)
         self.downloadforcountry("LBR", outputdir)
         self.downloadforcountry("SLE", outputdir)
