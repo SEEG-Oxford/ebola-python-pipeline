@@ -39,9 +39,9 @@ class Pipeline(object):
                 outputdir = arg
 
         if not localfiles:
-        self.downloadforcountry("GIN", outputdir)
-        self.downloadforcountry("LBR", outputdir)
-        self.downloadforcountry("SLE", outputdir)
+            self.downloadforcountry("GIN", outputdir)
+            self.downloadforcountry("LBR", outputdir)
+            self.downloadforcountry("SLE", outputdir)
 
         # as long as R is on your path this should work
         output = call(["R", "--silent", "--slave", "--vanilla",
