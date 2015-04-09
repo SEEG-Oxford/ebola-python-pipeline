@@ -100,6 +100,13 @@ image(log1p(confirmed))
 image(log1p(probable))
 image(log1p(confirmed_probable))
 
+# fix column names as the WHO decided to rename FREETOWN to WESTERN AREA URBAN, whereas all the maps etc still list it as FREETOWN
+colnames(confirmed_probable) <- gsub("WESTERN AREA URBAN", "FREETOWN", colnames(confirmed_probable))
+colnames(confirmed_probable) <- gsub("WESTERN AREA RURAL", "WESTERN RURAL", colnames(confirmed_probable))
+colnames(confirmed_probable) <- gsub("GIN_KISSIDOUGOU", "GIN_KISSIDOUGO", colnames(confirmed_probable))
+# put the order back again
+confirmed_probable <- confirmed_probable[,order(colnames(confirmed_probable))]
+
 
 pal <- colorRampPalette(c(grey(0.9),
                           'darkorange',
