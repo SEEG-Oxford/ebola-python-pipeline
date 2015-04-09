@@ -85,11 +85,13 @@ class Pipeline(object):
         requestobject.profile = "verbose"
         requestobject.countries = [countryname]
         requestobject.location = ["*"]
-        requestobject.datapackageid = [self.findlatestavailabledateforcountry(countryname)]
+        requestobject.datapackageid = [
+            self.findlatestavailabledateforcountry(countryname)]
         requestobject.indicatortype = ["SITREP_NEW"]
         requestobject.sex = "-"
 
-        self.whodataextractor = services.WHODataExtractor.WHODataExtractor(requestobject)
+        self.whodataextractor = services.WHODataExtractor.WHODataExtractor(
+            requestobject)
 
         data = self.whodataextractor.downloadfromwhowebsite()
 
@@ -99,12 +101,15 @@ class Pipeline(object):
 
     def findlatestavailabledateforcountry(self, country):
         date = None
-        data = urllib2.urlopen("http://apps.who.int/gho/data/node.ebola-sitrep.ebola-country-" + country + "-latest?lang=en")
+        data = urllib2.urlopen(
+            "http://apps.who.int/gho/data/node.ebola-sitrep.ebola-country-" +
+            country + "-latest?lang=en")
         # regular expression to pull out the latest packageid from the page
         m = re.search("DATAPACKAGEID:(.*?);", data.read())
         date = m.group(1)
         print "Latest data found for " + country + ": " + date
         return date
+
 
 if __name__ == '__main__':
     Pipeline = Pipeline()
