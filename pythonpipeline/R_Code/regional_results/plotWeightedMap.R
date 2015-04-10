@@ -98,7 +98,7 @@ totalWeeks <- nrow(allcasedata)
 # In order to calculate the AUC we need to not include the last week in the prediction
 mostRecent <- totalWeeks - 3
 
-all_cdr_europe <- read.csv('../data/all_cdr_europe.csv')
+all_cdr_europe <- read.csv('../../data/all_cdr_europe.csv')
 
 # 3 is france/gravity
 gravityriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,3)]), mostRecent+1, "France Gravity", auc=FALSE)

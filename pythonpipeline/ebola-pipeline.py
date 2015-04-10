@@ -75,12 +75,17 @@ class Pipeline(object):
                     reader.next()
                     datarow = reader.next()
                     newrow = [0 for x in range(len(datarow))]
+            if row_count < rowcount:
+                with open("data/EVD_conf_prob_additional.csv",
+                          "a") as additionalcsvfile:
+                    writer = csv.writer(additionalcsvfile, lineterminator='\n')
+                    for x in range(linestoadd):
+                        writer.writerow(newrow)
 
-            with open("data/EVD_conf_prob_additional.csv",
-                      "a") as additionalcsvfile:
-                writer = csv.writer(additionalcsvfile, lineterminator='\n')
-                for x in range(linestoadd):
-                    writer.writerow(newrow)
+        output = call(["R", "--silent", "--slave", "--vanilla",
+                       "--file=" + os.path.abspath("R_Code/regional_results/plotMap.R")], cwd="R_Code/regional_results")
+
+
 
 
     def downloadforcountry(self, countryname, outputdir):

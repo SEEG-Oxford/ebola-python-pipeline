@@ -104,8 +104,8 @@ mostRecent <- totalWeeks - 3
 # to create risk data for the coming week (i.e. predict the future) rather
 # than comparing the predicted risk with the known data for subsequent weeks
 
-all_cdr_europe <- read.csv('../data/all_cdr_europe.csv')
-west_africa_gravity <- read.csv('../data/gravity.csv')
+all_cdr_europe <- read.csv('../../data/all_cdr_europe.csv')
+west_africa_gravity <- read.csv('../../data/gravity.csv')
 
 # 3 is france/gravity
 riskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,3)]), mostRecent+1, "France Gravity", auc=FALSE)
