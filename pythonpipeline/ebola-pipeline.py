@@ -6,10 +6,14 @@ import services.WHODataPostProcessor
 from subprocess import call
 import sys
 import getopt
-import os.path
+import os
 import urllib2
 import re
 import csv
+import shutil
+import glob
+import datetime
+import re
 
 
 class Pipeline(object):
@@ -19,9 +23,10 @@ class Pipeline(object):
     def main(self, argv):
         rdir = ''
         datadir = ''
+        publishrepo = ''
         localfiles = False
         try:
-            opts, args = getopt.getopt(argv, "hlr:d:", ["rdir=", "datadir="])
+            opts, args = getopt.getopt(argv, "hlr:d:p:", ["rdir=", "datadir=", "publishrepo="])
         except getopt.GetoptError:
             print 'ebola-pipeline.py -r <R directory> ' \
                   '-d <data directory>'
@@ -37,6 +42,8 @@ class Pipeline(object):
                 rdir = arg
             elif opt in ("-d", "--datadir"):
                 datadir = arg
+            elif opt in ("-p", "--publishrepo"):
+                publishrepo = arg
 
         if not localfiles:
             self.downloadforcountry("GIN", datadir)
@@ -87,6 +94,31 @@ class Pipeline(object):
 
         output = call(["R", "--silent", "--slave", "--vanilla",
                        "--file=" + os.path.abspath(rdir + "/regional_results/plotWeightedMap.R")], cwd=rdir + "/regional_results")
+        if publishrepo != '':
+            # update the repository
+            # WARNING: This needs to be run from a shell that can access a valid private key for the repository
+            call(["git", "pull", "-v"], cwd=os.path.abspath(publishrepo))
+            repopath = os.path.abspath(publishrepo)
+            os.chdir(os.path.abspath(rdir + "/regional_results"))
+            for file in glob.glob("*.png"):
+                filename = os.path.basename(file)
+                shutil.copy(file, repopath + "/images/" + filename)
+                call(["git", "add", repopath + "/images/" + filename], cwd=repopath)
+
+            # basic markdown editing
+            s = open(repopath + "/local-risk.md", "r")
+            w = open(repopath + "/local-risk.md1", "w")
+            for line in s.readlines():
+                line = re.sub(r"(### Latest data as of )(.*)", r"\1 " + str(datetime.date.today()), line)
+                w.write(line)
+            s.close()
+            w.close()
+            os.remove(repopath + "/local-risk.md")
+            os.rename(repopath + "/local-risk.md1", repopath + "/local-risk.md")
+
+            call(["git", "add", repopath + "/local-risk.md"], cwd=repopath)
+
+            call(["git", "commit", "-m", "Updated WHO data and regional risk plots as of " + str(datetime.date.today())], cwd=repopath)
 
     def downloadforcountry(self, countryname, outputdir):
         requestobject = model.WHORequestObject.WHORequestObject()
