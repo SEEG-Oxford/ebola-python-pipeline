@@ -17,40 +17,40 @@ class Pipeline(object):
         self.whodataextractor = None
 
     def main(self, argv):
-        rsourcefile = ''
-        outputdir = ''
+        rdir = ''
+        datadir = ''
         localfiles = False
         try:
-            opts, args = getopt.getopt(argv, "hlr:o:", ["rfile=", "outputdir="])
+            opts, args = getopt.getopt(argv, "hlr:d:", ["rdir=", "datadir="])
         except getopt.GetoptError:
-            print 'ebola-pipeline.py -r <R source filename> ' \
-                  '-o <output directory>'
+            print 'ebola-pipeline.py -r <R directory> ' \
+                  '-d <data directory>'
             sys.exit(2)
         for opt, arg in opts:
             if opt == '-h':
-                print 'ebola-pipeline.py -r <R source filename> ' \
-                      '-o <output directory>'
+                print 'ebola-pipeline.py -r <R directory> ' \
+                      '-d <data directory>'
                 sys.exit()
             elif opt in ("-l"):
                 localfiles = True
-            elif opt in ("-r", "--rfile"):
-                rsourcefile = arg
-            elif opt in ("-o", "--outputdir"):
-                outputdir = arg
+            elif opt in ("-r", "--rdir"):
+                rdir = arg
+            elif opt in ("-d", "--datadir"):
+                datadir = arg
 
         if not localfiles:
-            self.downloadforcountry("GIN", outputdir)
-            self.downloadforcountry("LBR", outputdir)
-            self.downloadforcountry("SLE", outputdir)
+            self.downloadforcountry("GIN", datadir)
+            self.downloadforcountry("LBR", datadir)
+            self.downloadforcountry("SLE", datadir)
 
         # as long as R is on your path this should work
         output = call(["R", "--silent", "--slave", "--vanilla",
-                       "--file=" + os.path.abspath(rsourcefile)], cwd=outputdir)
+                       "--file=" + os.path.abspath(rdir + "/import_EVD_case_data.R")], cwd=datadir)
 
         # fix the files to make them compatible with our plotting code
-        with open(outputdir + "/EVD_conf_prob_.csv") as csvfile:
+        with open(datadir + "/EVD_conf_prob_.csv") as csvfile:
             reader = csv.reader(csvfile)
-            with open("data/expected_output_headers.csv") as headerfile:
+            with open(datadir + "/expected_output_headers.csv") as headerfile:
                 headerreader = csv.reader(headerfile)
                 headers = headerreader.next()
                 postprocessor = services.WHODataPostProcessor\
@@ -59,11 +59,11 @@ class Pipeline(object):
 
             rowcount = len(correcteddata)
 
-            with open(outputdir + "/EVD_conf_prob_.csv", 'w') as csvoutput:
+            with open(datadir + "/EVD_conf_prob_.csv", 'w') as csvoutput:
                 writer = csv.writer(csvoutput, lineterminator='\n')
                 writer.writerows(correcteddata)
 
-            with open("data/EVD_conf_prob_additional.csv") as additionalcsvfile:
+            with open(datadir + "/EVD_conf_prob_additional.csv") as additionalcsvfile:
                 reader = csv.reader(additionalcsvfile)
                 row_count = sum(1 for row in reader)
                 if row_count < rowcount:
@@ -76,20 +76,17 @@ class Pipeline(object):
                     datarow = reader.next()
                     newrow = [0 for x in range(len(datarow))]
             if row_count < rowcount:
-                with open("data/EVD_conf_prob_additional.csv",
+                with open(datadir + "/EVD_conf_prob_additional.csv",
                           "a") as additionalcsvfile:
                     writer = csv.writer(additionalcsvfile, lineterminator='\n')
                     for x in range(linestoadd):
                         writer.writerow(newrow)
 
         output = call(["R", "--silent", "--slave", "--vanilla",
-                       "--file=" + os.path.abspath("R_Code/regional_results/plotMap.R")], cwd="R_Code/regional_results")
+                       "--file=" + os.path.abspath(rdir + "/regional_results/plotMap.R")], cwd=rdir + "/regional_results")
 
         output = call(["R", "--silent", "--slave", "--vanilla",
-                       "--file=" + os.path.abspath("R_Code/regional_results/plotWeightedMap.R")], cwd="R_Code/regional_results")
-
-
-
+                       "--file=" + os.path.abspath(rdir + "/regional_results/plotWeightedMap.R")], cwd=rdir + "/regional_results")
 
     def downloadforcountry(self, countryname, outputdir):
         requestobject = model.WHORequestObject.WHORequestObject()
