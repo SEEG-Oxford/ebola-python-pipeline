@@ -85,6 +85,9 @@ class Pipeline(object):
         output = call(["R", "--silent", "--slave", "--vanilla",
                        "--file=" + os.path.abspath("R_Code/regional_results/plotMap.R")], cwd="R_Code/regional_results")
 
+        output = call(["R", "--silent", "--slave", "--vanilla",
+                       "--file=" + os.path.abspath("R_Code/regional_results/plotWeightedMap.R")], cwd="R_Code/regional_results")
+
 
 
 
