@@ -101,16 +101,40 @@ mostRecent <- totalWeeks - 3
 all_cdr_europe <- read.csv('../../data/all_cdr_europe.csv')
 
 # 3 is france/gravity
-gravityriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,3)]), mostRecent+1, "France Gravity", auc=FALSE)
+francegravityriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,3)]), mostRecent+1, "France Gravity", auc=FALSE)
 
 # 6 is france/radiation
-radiationriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,6)]), mostRecent+1, "France Original Radiation", auc=FALSE)
+franceradiationriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,6)]), mostRecent+1, "France Original Radiation", auc=FALSE)
 
 # 9 is france/radiation-with-selection
-radselriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,9)]), mostRecent+1, "France Radiation with Selection", auc=FALSE)
+franceradselriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,9)]), mostRecent+1, "France Radiation with Selection", auc=FALSE)
 
 # 12 is france/uniform
-uniformriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,12)]), mostRecent+1, "France Uniform", auc=FALSE)
+franceuniformriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,12)]), mostRecent+1, "France Uniform", auc=FALSE)
+
+# 4 is portugal/gravity
+portugalgravityriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,4)]), mostRecent+1, "Portugal Gravity", auc=FALSE)
+
+# 7 is portugal/radiation
+portugalradiationriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,7)]), mostRecent+1, "Portugal Original Radiation", auc=FALSE)
+
+# 10 is portugal/radiation-with-selection
+portugalradselriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,10)]), mostRecent+1, "Portugal Radiation with Selection", auc=FALSE)
+
+# 13 is portugal/uniform
+portugaluniformriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,13)]), mostRecent+1, "Portugal Uniform", auc=FALSE)
+
+# 5 is spain/gravity
+spaingravityriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,5)]), mostRecent+1, "Spain Gravity", auc=FALSE)
+
+# 8 is spain/radiation
+spainradiationriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,8)]), mostRecent+1, "Spain Original Radiation", auc=FALSE)
+
+# 11 is spain/radiation-with-selection
+spainradselriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,11)]), mostRecent+1, "Spain Radiation with Selection", auc=FALSE)
+
+# 14 is spain/uniform
+spainuniformriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,14)]), mostRecent+1, "Spain Uniform", auc=FALSE)
 
 # read all aucs
 aucs <- read.csv('aucdata.csv')
@@ -118,17 +142,29 @@ aucs <- read.csv('aucdata.csv')
 latestaucs <- tail(aucs,3)
 # get the average ignore NaNs, nulls etc
 avgauc <- colMeans(aucs[,c(-1:-2)], na.rm = TRUE)
+names(avgauc) <- predictionModelNames
 
 # multiply each models predicted risk by its avg auc value
-weighted_gravity <- gravityriskdata$predictedRegions * avgauc[1]
-weighted_radiation <- radiationriskdata$predictedRegions * avgauc[2]
-weighted_radsel <- radselriskdata$predictedRegions * avgauc[3]
-weighted_uniform <- uniformriskdata$predictedRegions * avgauc[4]
+franceweighted_gravity <- francegravityriskdata$predictedRegions * avgauc[1]
+franceweighted_radiation <- franceradiationriskdata$predictedRegions * avgauc[2]
+franceweighted_radsel <- franceradselriskdata$predictedRegions * avgauc[3]
+franceweighted_uniform <- franceuniformriskdata$predictedRegions * avgauc[4]
+portugalweighted_gravity <- portugalgravityriskdata$predictedRegions * avgauc[5]
+portugalweighted_radiation <- portugalradiationriskdata$predictedRegions * avgauc[6]
+portugalweighted_radsel <- portugalradselriskdata$predictedRegions * avgauc[7]
+portugalweighted_uniform <- portugaluniformriskdata$predictedRegions * avgauc[8]
+spainweighted_gravity <- spaingravityriskdata$predictedRegions * avgauc[9]
+spainweighted_radiation <- spainradiationriskdata$predictedRegions * avgauc[10]
+spainweighted_radsel <- spainradselriskdata$predictedRegions * avgauc[11]
+spainweighted_uniform <- spainuniformriskdata$predictedRegions * avgauc[12]
 
 # sum the weighted risks
-weighted_riskdata <- weighted_gravity + weighted_radiation + weighted_radsel + weighted_uniform
+weighted_riskdata <- franceweighted_gravity + franceweighted_radiation + franceweighted_radsel + franceweighted_uniform + portugalweighted_gravity + portugalweighted_radiation + portugalweighted_radsel + portugalweighted_uniform + spainweighted_gravity + spainweighted_radiation + spainweighted_radsel + spainweighted_uniform
 # normalise 0..1
 weighted_riskdata <- weighted_riskdata / max(weighted_riskdata)
 
 # plot
-plotRisks(vals, districts, countries, country_borders, weighted_riskdata, gravityriskdata$reportedCases, "Regional relative risk of Ebola importation\n using weighted prediction model data", "regional_prediction_weighted")
+plotRisks(vals, districts, countries, country_borders, weighted_riskdata, francegravityriskdata$reportedCases, "Regional relative risk of Ebola importation\n using weighted prediction model data", "regional_prediction_weighted")
+# print out the relative proportions of each prediction in the weighted map
+print((avgauc[1:12] / max(avgauc[1:12])) /sum(avgauc[1:12]))
+write.csv((avgauc[1:12] / max(avgauc[1:12])) /sum(avgauc[1:12]), "weightings.csv")
