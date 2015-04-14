@@ -120,6 +120,8 @@ class Pipeline(object):
 
             call(["git", "commit", "-m", "Updated WHO data and regional risk plots as of " + str(datetime.date.today())], cwd=repopath)
 
+            call(["git", "push", "-v"], cwd=repopath)
+
     def downloadforcountry(self, countryname, outputdir):
         requestobject = model.WHORequestObject.WHORequestObject()
         requestobject.format = "data-verbose.csv"
