@@ -118,6 +118,8 @@ class Pipeline(object):
 
             call(["git", "add", repopath + "/local-risk.md"], cwd=repopath)
 
+            call(["git", "add", repopath + "/weightings.csv"], cwd=repopath)
+
             call(["git", "commit", "-m", "Updated WHO data and regional risk plots as of " + str(datetime.date.today())], cwd=repopath)
 
             call(["git", "push", "-v"], cwd=repopath)
