@@ -51,7 +51,7 @@ plotMap <- function (vals,
   title(main=plotTitle)  
 }
 
-plotRisks <- function(vals, districts, countries, country_borders, predictedRegions, reportedCases, plotTitle, filename) {
+plotRisks <- function(districts, countries, country_borders, predictedRegions, reportedCases, plotTitle, filename) {
 	vals <- rep(NA, nrow(districts))
 	for(idx in 1:length(predictedRegions)) {	
 		vals[match(names(predictedRegions[idx]), paste(districts$COUNTRY_ID,districts$NAME, sep='_'))] <- predictedRegions[idx]
@@ -164,7 +164,7 @@ weighted_riskdata <- franceweighted_gravity + franceweighted_radiation + francew
 weighted_riskdata <- weighted_riskdata / max(weighted_riskdata)
 
 # plot
-plotRisks(vals, districts, countries, country_borders, weighted_riskdata, francegravityriskdata$reportedCases, "Regional relative risk of Ebola importation\n using weighted prediction model data", "regional_prediction_weighted")
+plotRisks(districts, countries, country_borders, weighted_riskdata, francegravityriskdata$reportedCases, "Regional relative risk of Ebola importation\n using weighted prediction model data", "regional_prediction_weighted")
 # print out the relative proportions of each prediction in the weighted map
 print((avgauc[1:12] / max(avgauc[1:12])) /sum(avgauc[1:12]))
 write.csv((avgauc[1:12] / max(avgauc[1:12])) /sum(avgauc[1:12]), "weightings.csv")
