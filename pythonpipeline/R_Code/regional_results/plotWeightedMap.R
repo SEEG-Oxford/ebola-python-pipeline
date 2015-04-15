@@ -141,7 +141,7 @@ aucs <- read.csv('aucdata.csv')
 # pull out the last 3
 latestaucs <- tail(aucs,3)
 # get the average ignore NaNs, nulls etc
-avgauc <- colMeans(aucs[,c(-1:-2)], na.rm = TRUE)
+avgauc <- colMeans(latestaucs[,c(-1:-2)], na.rm = TRUE)
 names(avgauc) <- predictionModelNames
 
 # multiply each models predicted risk by its avg auc value
