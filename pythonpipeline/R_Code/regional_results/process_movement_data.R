@@ -31,9 +31,10 @@ as.movementmatrix <- function(dataframe) {
 }
 
 # pull out origin, destination and radiation with selection_france
-getData <- function(raw_movement_matrix, startWeek, name, auc=TRUE) {
-	endWeek <- startWeek+2
-	casedata <- colSums(allcasedata[c(startWeek:endWeek),][,-1])
+getData <- function(raw_movement_matrix, endWeek, name, auc=TRUE) {
+	startWeek <- endWeek-3
+	if (startWeek < 1) startWeek <- 0
+	casedata <- colSums(allcasedata[c(startWeek:(endWeek-1)),][,-1])
 	
 	
 	## prepare the region names
@@ -101,7 +102,7 @@ getData <- function(raw_movement_matrix, startWeek, name, auc=TRUE) {
 	if(auc) {
 		# calculate AUC
 		# select the week being predicted
-		weekbeingpredicted <- allcasedata[endWeek+1,][,-1]
+		weekbeingpredicted <- allcasedata[endWeek,][,-1]
 		# make it logical (either there are cases or not)
 		weekbeingpredicted[weekbeingpredicted > 0] <- 1
 		
