@@ -86,17 +86,19 @@ plotRisks <- function(risks, countries, all_countries, filename, maptitle) {
 countries <- shapefile('infoRM_countries.shp')
 adm0 <- shapefile('admin2013_0.shp')
 
-data <- read.csv("international_importation_risk.csv")
+source("calculateRisks.R")
 
-risks <- data.frame(country=as.vector(tail(data$X, 191)), risk=as.vector(tail(data$X.4, 191)))
+countrycodes <- as.vector(all$country.1)
+
+risks <- data.frame(country=countrycodes, risk=all$importation_risk)
 plotRisks(risks, countries, adm0, "global_Overall_prediction", "Global relative risk of Ebola importation from overall model")
 
-risks <- data.frame(country=as.vector(tail(data$X, 191)), risk=as.vector(tail(data$X.3, 191)))
+risks <- data.frame(country=countrycodes, risk=all$adjacency_relative)
 plotRisks(risks, countries, adm0, "global_Adjacency_prediction", "Global relative risk of Ebola importation from Adjacency model")
 
-risks <- data.frame(country=as.vector(tail(data$X, 191)), risk=as.vector(tail(data$X.2, 191)))
+risks <- data.frame(country=countrycodes, risk=all$gravity_relative)
 plotRisks(risks, countries, adm0, "global_Gravity_prediction", "Global relative risk of Ebola importation from Gravity model")
 
-risks <- data.frame(country=as.vector(tail(data$X, 191)), risk=as.vector(tail(data$X.1, 191)))
+risks <- data.frame(country=countrycodes, risk=all$migration_relative)
 plotRisks(risks, countries, adm0, "global_Migration_prediction", "Global relative risk of Ebola importation from Migration model")
 
