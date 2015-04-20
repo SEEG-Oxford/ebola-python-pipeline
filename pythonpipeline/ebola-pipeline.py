@@ -50,6 +50,8 @@ class Pipeline(object):
             self.downloadforcountry("LBR", datadir)
             self.downloadforcountry("SLE", datadir)
 
+        rcodedir = os.path.abspath(rdir)
+
         # as long as R is on your path this should work
         output = call(["R", "--silent", "--slave", "--vanilla",
                        "--file=" + os.path.abspath(rdir + "/import_EVD_case_data.R")], cwd=datadir)
@@ -122,9 +124,11 @@ class Pipeline(object):
 
             call(["git", "add", repopath + "/local-risk.md"], cwd=repopath)
 
+            shutil.copy(rcodedir + "/regional_results/weightings.csv", repopath + "/weightings.csv")
+
             call(["git", "add", repopath + "/weightings.csv"], cwd=repopath)
 
-            os.chdir(os.path.abspath(rdir + "/global_results"))
+            os.chdir(os.path.abspath(rcodedir + "/global_results"))
             for file in glob.glob("*.png"):
                 filename = os.path.basename(file)
                 shutil.copy(file, repopath + "/images/" + filename)
