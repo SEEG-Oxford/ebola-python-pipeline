@@ -7,7 +7,7 @@ require(rgdal)
 require(aqfig)
 require(foreach)
 require(doParallel)
-source('palettes.R')
+source('../palettes.R')
 source('process_movement_data.R')
 
 plotMap <- function (vals,

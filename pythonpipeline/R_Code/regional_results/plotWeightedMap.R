@@ -5,7 +5,7 @@ require(raster)
 require(SDMTools)
 require(rgdal)
 require(aqfig)
-source('palettes.R')
+source('../palettes.R')
 source('process_movement_data.R')
 
 plotMap <- function (vals,
