@@ -110,3 +110,57 @@ plotGlobalRisks <- function(risks, countries, all_countries, filename, maptitle)
 			maptitle=maptitle)
 	dev.off()
 }
+
+plotDate <- function(datestring, filename) {
+	par(mar = c(0,0,0,0))
+	png(filename=paste(filename, ".png", sep=""), width=800, height=200, units='px', pointsize=18)
+		plot.new()
+		title(main=datestring, col.main=grey(0.4))
+		dev.off()
+	par(mar = c(5, 4, 4, 2) + 0.1)
+}
+
+plotHistoricCases <- function(districts, countries, country_borders, predictedRegions, reportedCases, plotTitle, filename) {
+	vals <- rep(NA, nrow(districts))
+	for(idx in 1:length(predictedRegions)) {	
+		vals[match(names(predictedRegions[idx]), paste(districts$COUNTRY_ID,districts$NAME, sep='_'))] <- predictedRegions[idx]
+	}
+	png(filename=paste(filename, ".png", sep=""), width=800, height=700, units='px', pointsize=20)
+	plotHistoricCaseMap(vals,
+			districts,
+			countries,
+			country_borders,
+			zlim = c(0, max(log(allcasedata[,-1]))),
+			ramp = colorRampPalette(c("#fcbba1","#fc9272","#fb6a4a","#ef3b2c","#cb181d","#a50f15","#67000d")),#seqRamp('Reds'), #c("#fff5f0","#fee0d2","#fcbba1","#fc9272","#fb6a4a","#ef3b2c","#cb181d","#a50f15","#67000d")
+			reportedCases = reportedCases,
+			plotTitle = plotTitle)
+	dev.off()
+}
+
+plotHistoricCaseMap <- function (vals,
+                     districts,
+                     countries,
+                     country_borders,
+                     zlim = range(vals),
+                     ramp = seqRamp(),
+                     n = 1000,
+					 reportedCases,
+					 plotTitle) {
+# get the colours
+  col_range <- seq(zlim[1], zlim[2], length.out = n)
+  cols <- ramp(n)
+  
+  bins <- cut(vals, col_range, include.lowest = TRUE)
+  regionColours <- cols[bins]
+
+  newbins <- cut(log(reportedCases), col_range, include.lowest = TRUE)
+  newcols <- cols[newbins]
+  
+  regionColours[paste(districts$COUNTRY_ID,districts$NAME, sep='_') %in% names(reportedCases)] <- newcols
+  
+  par(mar=c(1,1,2,2))
+  plot(countries, col = gray(0.9), border = 'white', lwd = 3)
+  plot(districts, col = regionColours, border = 'white', add = TRUE)
+  plot(country_borders, col = grey(0.4), add = TRUE)
+  title(main=plotTitle)  
+}
