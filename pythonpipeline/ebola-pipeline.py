@@ -100,6 +100,12 @@ class Pipeline(object):
         output = call(["R", "--silent", "--slave", "--vanilla",
                        "--file=" + os.path.abspath(rdir + "/global_results/plotMap.R")], cwd=rdir + "/global_results")
 
+        output = call(["R", "--silent", "--slave", "--vanilla",
+                       "--file=" + os.path.abspath(rdir + "/regional_case_history/createRegionalCaseHistoryPlots.R")], cwd=rdir + "/regional_case_history")
+
+        output = call(["R", "--silent", "--slave", "--vanilla",
+                       "--file=" + os.path.abspath(rdir + "/regional_prediction_history/createRegionalPredictionHistory.R")], cwd=rdir + "/regional_prediction_history")
+
         if publishrepo != '':
             # update the repository
             # WARNING: This needs to be run from a shell that can access a valid private key for the repository
