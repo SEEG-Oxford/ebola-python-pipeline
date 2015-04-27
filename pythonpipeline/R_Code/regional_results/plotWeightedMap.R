@@ -5,7 +5,7 @@ require(raster)
 require(SDMTools)
 require(rgdal)
 source('process_movement_data.R')
-source('plotFunctions.R')
+source('../plotFunctions.R')
 
 # load shapefiles
 districts <- shapefile('ad2_FINAL.shp')
