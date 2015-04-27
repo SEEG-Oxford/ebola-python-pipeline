@@ -6,13 +6,13 @@ require(SDMTools)
 require(rgdal)
 require(foreach)
 require(doParallel)
-source('process_movement_data.R')
+source('../process_movement_data.R')
 source('../plotFunctions.R')
 
 # load shapefiles
-districts <- shapefile('ad2_FINAL.shp')
-countries <- shapefile('countries_wa.shp')
-country_borders <- shapefile('country_borders_wa.shp')
+districts <- shapefile('../../data/shapefiles/ad2_FINAL.shp')
+countries <- shapefile('../../data/shapefiles/countries_wa.shp')
+country_borders <- shapefile('../../data/shapefiles/country_borders_wa.shp')
 
 # fix an error in districts where CIV has 2 regions named BELIER. One should be MORONOU
 dnames <- districts$NAME

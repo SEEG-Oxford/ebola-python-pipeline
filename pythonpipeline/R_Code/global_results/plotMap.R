@@ -7,8 +7,8 @@ require(rgdal)
 source('../plotFunctions.R')
 
 # load shapefiles
-countries <- shapefile('infoRM_countries.shp')
-adm0 <- shapefile('admin2013_0.shp')
+countries <- shapefile('../../data/shapefiles/infoRM_countries.shp')
+adm0 <- shapefile('../../data/shapefiles/admin2013_0.shp')
 
 source("calculateRisks.R")
 

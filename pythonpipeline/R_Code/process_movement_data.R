@@ -1,4 +1,4 @@
-source("AUC.R")
+source("../AUC.R")
 # n= number of weeks data to read from the end of the file
 allcasedata <- read.csv('../../data/EVD_conf_prob_.csv')
 # this must be exactly the same format as allcasedata and will also need curating
@@ -116,4 +116,37 @@ getData <- function(raw_movement_matrix, endWeek, name, auc=TRUE) {
 	}
 	
 	return (list(reportedCases=reportedCases, predictedRegions=predictedRegions, AUC=AUC))
+}
+
+getSimpleData <- function(endWeek) {
+	startWeek <- endWeek-2
+	if(startWeek < 0) startWeek <- 0
+	casedata <- colSums(allcasedata[c(startWeek:endWeek),][,-1])
+	
+	
+	## prepare the region names
+	districtNames <- names(casedata)
+
+	districtNames <- gsub("[.]", "_", districtNames)
+	districtNames <- gsub("\\s", "_", districtNames)
+	districtNames <- gsub("'", "_", districtNames)
+
+	# Correct names of certain regions which are different in the shapefile
+	districtNames <- gsub("LBR_RIVER_GEE", "LBR_RIVER_GHEE", districtNames)
+	districtNames <- gsub("CIV_GBEKE", "CIV_GBÊKE", districtNames)
+	districtNames <- gsub("CIV_GBOKLE", "CIV_GBÔKLE", districtNames)
+	districtNames <- gsub("CIV_GOH", "CIV_GÔH", districtNames)
+	districtNames <- gsub("CIV_LOH_DJIBOUA", "CIV_LÔH_DJIBOUA", districtNames)
+
+
+	names(casedata) <- districtNames
+
+	# these are the "core" districts
+	reportedCases <- casedata[casedata > 0]
+	reportedNames <- names(reportedCases)
+	reportedNames <- gsub("\\s", "_", reportedNames)
+	reportedNames <- gsub("'", "_", reportedNames)
+	reportedNames <- gsub("[.]", "_", reportedNames)
+	
+	return (reportedCases)
 }
