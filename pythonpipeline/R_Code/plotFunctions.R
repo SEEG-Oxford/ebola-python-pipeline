@@ -1,4 +1,5 @@
 require(aqfig)
+require(leafletR)
 source('../palettes.R')
 
 plotRegionalMap <- function (vals,
@@ -9,7 +10,8 @@ plotRegionalMap <- function (vals,
                      ramp = seqRamp(),
                      n = 1000,
 					 reportedCases,
-					 plotTitle) {
+					 plotTitle,
+					 dir_name=NA) {
   # get the colours
   col_range <- seq(zlim[1], zlim[2], length.out = n)
   cols <- ramp(n)
@@ -24,7 +26,15 @@ plotRegionalMap <- function (vals,
   plot(districts, col = regionColours, border = 'white', add = TRUE)
   plot(country_borders, col = grey(0.4), add = TRUE)
   vertical.image.legend(col=seqRamp('YlOrRd')(1000),zlim=c(0,1))
-  title(main=plotTitle)  
+  title(main=plotTitle)
+  if(!is.na(dir_name)) {
+	  print("test")
+	  districts$risk <- vals
+	  q.dat <- toGeoJSON(data=districts, dest=dir_name, name="districts")
+	  q.style <- styleCat(prop="ID", val=seq(0,248), style.val=regionColours, lwd=1, leg="a")
+	  q.map <- leaflet(data=q.dat, dest=dir_name, title="Regional Risk", base.map=list("positron", "darkmatter", "mqsat", "tls", "osm"), style=q.style, popup="*", controls=list("zoom", "scale", "layer"))
+	  q.map
+  }
 }
 
 plotRegionalRisks <- function(districts, countries, country_borders, predictedRegions, reportedCases, plotTitle, filename) {
@@ -32,7 +42,8 @@ plotRegionalRisks <- function(districts, countries, country_borders, predictedRe
 	for(idx in 1:length(predictedRegions)) {	
 		vals[match(names(predictedRegions[idx]), paste(districts$COUNTRY_ID,districts$NAME, sep='_'))] <- predictedRegions[idx]
 	}
-	png(filename=paste(filename, ".png", sep=""), width=800, height=700, units='px', pointsize=20)
+	newfilename <- paste(filename, ".png", sep="")
+	png(filename=newfilename, width=800, height=700, units='px', pointsize=20)
 	plotRegionalMap(vals,
 			districts,
 			countries,
@@ -40,7 +51,8 @@ plotRegionalRisks <- function(districts, countries, country_borders, predictedRe
 			zlim = c(0, 1),
 			ramp = seqRamp('YlOrRd'),
 			reportedCases = reportedCases,
-			plotTitle = plotTitle)
+			plotTitle = plotTitle,
+			dir_name = dirname(newfilename))
 	dev.off()
 	png(filename=paste(filename, "large.png", sep="_"), width=8000, height=7000, units='px', pointsize=100)
 	plotRegionalMap(vals,
