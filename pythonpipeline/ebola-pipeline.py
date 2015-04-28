@@ -144,14 +144,14 @@ class Pipeline(object):
             for file in glob.glob("*_cases_week.png"):
                 historycount += 1
                 filename = os.path.basename(file)
-                shutil.copy(file, repopath + "/images/cases" + filename)
-                call(["git", "add", repopath + "/images/cases" + filename], cwd=repopath)
+                shutil.copy(file, repopath + "/images/cases/" + filename)
+                call(["git", "add", repopath + "/images/cases/" + filename], cwd=repopath)
 
             os.chdir(os.path.abspath(rcodedir + "/regional_prediction_history"))
             for file in glob.glob("*.png"):
                 filename = os.path.basename(file)
-                shutil.copy(file, repopath + "/images/predictions" + filename)
-                call(["git", "add", repopath + "/images/predictions" + filename], cwd=repopath)
+                shutil.copy(file, repopath + "/images/predictions/" + filename)
+                call(["git", "add", repopath + "/images/predictions/" + filename], cwd=repopath)
 
             # basic markdown editing
             s = open(repopath + "/global-risk.md", "r")
