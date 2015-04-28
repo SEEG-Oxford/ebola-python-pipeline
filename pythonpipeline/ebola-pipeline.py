@@ -140,6 +140,19 @@ class Pipeline(object):
                 shutil.copy(file, repopath + "/images/" + filename)
                 call(["git", "add", repopath + "/images/" + filename], cwd=repopath)
 
+            os.chdir(os.path.abspath(rcodedir + "/regional_case_history"))
+            for file in glob.glob("*_cases_week.png"):
+                historycount += 1
+                filename = os.path.basename(file)
+                shutil.copy(file, repopath + "/images/cases" + filename)
+                call(["git", "add", repopath + "/images/cases" + filename], cwd=repopath)
+
+            os.chdir(os.path.abspath(rcodedir + "/regional_prediction_history"))
+            for file in glob.glob("*.png"):
+                filename = os.path.basename(file)
+                shutil.copy(file, repopath + "/images/predictions" + filename)
+                call(["git", "add", repopath + "/images/predictions" + filename], cwd=repopath)
+
             # basic markdown editing
             s = open(repopath + "/global-risk.md", "r")
             w = open(repopath + "/global-risk.md1", "w")
@@ -152,6 +165,33 @@ class Pipeline(object):
             os.rename(repopath + "/global-risk.md1", repopath + "/global-risk.md")
 
             call(["git", "add", repopath + "/global-risk.md"], cwd=repopath)
+
+
+            # basic markdown editing
+            s = open(repopath + "/case-history.md", "r")
+            w = open(repopath + "/case-history.md1", "w")
+            for line in s.readlines():
+                line = re.sub(r"(<input type=\"range\" min=\"1\" max=\")(\d*)(\" value=\"1\" step=\"1\" data-rangeslider>)", r"\g<1>" + str(historycount) + r"\g<3>", line)
+                w.write(line)
+            s.close()
+            w.close()
+            os.remove(repopath + "/case-history.md")
+            os.rename(repopath + "/case-history.md1", repopath + "/case-history.md")
+
+            call(["git", "add", repopath + "/case-history.md"], cwd=repopath)
+
+            # basic markdown editing
+            s = open(repopath + "/prediction-history.md", "r")
+            w = open(repopath + "/prediction-history.md1", "w")
+            for line in s.readlines():
+                line = re.sub(r"(<input type=\"range\" min=\"4\" max=\")(\d*)(\" value=\"1\" step=\"1\" data-rangeslider>)", r"\g<1>" + str(historycount) + r"\g<3>", line)
+                w.write(line)
+            s.close()
+            w.close()
+            os.remove(repopath + "/prediction-history.md")
+            os.rename(repopath + "/prediction-history.md1", repopath + "/prediction-history.md")
+
+            call(["git", "add", repopath + "/prediction-history.md"], cwd=repopath)
 
             call(["git", "commit", "-m", "Updated WHO data and regional risk plots as of " + str(datetime.date.today())], cwd=repopath)
 
