@@ -174,5 +174,6 @@ plotHistoricCaseMap <- function (vals,
   plot(countries, col = gray(0.9), border = 'white', lwd = 3)
   plot(districts, col = regionColours, border = 'white', add = TRUE)
   plot(country_borders, col = grey(0.4), add = TRUE)
+  vertical.image.legend(col=ramp(n),zlim=c(0,1))
   title(main=plotTitle)  
 }
