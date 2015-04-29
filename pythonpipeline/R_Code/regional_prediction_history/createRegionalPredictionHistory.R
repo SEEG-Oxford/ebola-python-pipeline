@@ -49,7 +49,7 @@ plotMap <- function (vals,
   plot(countries, col = grey(0.9), border = 'white', lwd = 3)
   plot(districts, col = regionColours, border = 'white', add = TRUE)
   plot(country_borders, col = grey(0.4), add = TRUE)
-  # vertical.image.legend(col=seqRamp('YlOrRd')(1000),zlim=c(0,1))
+  vertical.image.legend(col=seqRamp('YlOrRd')(1000),zlim=c(0,1))
   title(main=plotTitle)  
 }
 
@@ -103,6 +103,7 @@ registerDoParallel(cl)
 aucmatrix <- foreach(idx=4:mostRecent,.combine=rbind) %dopar% {
 source('../palettes.R')
 source('../process_movement_data.R')
+require(aqfig)
 	# 3 is france/gravity
 francegravityriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,3)]), idx, "France Gravity", auc=FALSE)
 
