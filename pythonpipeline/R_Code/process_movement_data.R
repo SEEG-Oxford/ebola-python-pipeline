@@ -115,7 +115,7 @@ getData <- function(raw_movement_matrix, endWeek, name, auc=TRUE) {
 		AUC <- AUC(data.frame(weekbeingpredicted), data.frame(predictions),plot=FALSE,error_bars=FALSE,ci=0.95,res=100,main=name)
 	}
 	
-	return (list(reportedCases=reportedCases, predictedRegions=predictedRegions, AUC=AUC))
+	return (list(reportedCases=reportedCases, predictedRegions=predictedRegions, AUC=AUC, name=name))
 }
 
 getSimpleData <- function(endWeek) {

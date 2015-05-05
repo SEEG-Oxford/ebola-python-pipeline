@@ -11,7 +11,8 @@ plotRegionalMap <- function (vals,
                      n = 1000,
 					 reportedCases,
 					 plotTitle,
-					 dir_name=NA) {
+					 dir_name=NA,
+					 leaflet) {
   # get the colours
   col_range <- seq(zlim[1], zlim[2], length.out = n)
   cols <- ramp(n)
@@ -27,8 +28,7 @@ plotRegionalMap <- function (vals,
   plot(country_borders, col = grey(0.4), add = TRUE)
   vertical.image.legend(col=seqRamp('YlOrRd')(1000),zlim=c(0,1))
   title(main=plotTitle)
-  if(!is.na(dir_name)) {
-	  print("test")
+  if(leaflet & !is.na(dir_name)) {
 	  districts$risk <- vals
 	  q.dat <- toGeoJSON(data=districts, dest=dir_name, name="districts")
 	  q.style <- styleCat(prop="ID", val=seq(0,248), style.val=regionColours, lwd=1, leg="a")
@@ -37,7 +37,7 @@ plotRegionalMap <- function (vals,
   }
 }
 
-plotRegionalRisks <- function(districts, countries, country_borders, predictedRegions, reportedCases, plotTitle, filename) {
+plotRegionalRisks <- function(districts, countries, country_borders, predictedRegions, reportedCases, plotTitle, filename, leaflet=TRUE) {
 	vals <- rep(NA, nrow(districts))
 	for(idx in 1:length(predictedRegions)) {	
 		vals[match(names(predictedRegions[idx]), paste(districts$COUNTRY_ID,districts$NAME, sep='_'))] <- predictedRegions[idx]
@@ -52,7 +52,8 @@ plotRegionalRisks <- function(districts, countries, country_borders, predictedRe
 			ramp = seqRamp('YlOrRd'),
 			reportedCases = reportedCases,
 			plotTitle = plotTitle,
-			dir_name = dirname(newfilename))
+			dir_name = dirname(newfilename),
+			leaflet = leaflet)
 	dev.off()
 	png(filename=paste(filename, "large.png", sep="_"), width=8000, height=7000, units='px', pointsize=100)
 	plotRegionalMap(vals,
@@ -62,8 +63,52 @@ plotRegionalRisks <- function(districts, countries, country_borders, predictedRe
 			zlim = c(0, 1),
 			ramp = seqRamp('YlOrRd'),
 			reportedCases = reportedCases,
-			plotTitle = plotTitle)
+			plotTitle = plotTitle,
+			leaflet = leaflet)
 	dev.off()
+}
+
+plotCompositeLeaflet <- function(districts, riskList) {
+	for(i in 1:12) {
+		vals <- getVals(districts, riskList[[i]])
+		
+		#bins <- cut(vals, col_range, include.lowest = TRUE)
+		#regionColours <- cols[bins]
+		
+		#regionColours[paste(districts$COUNTRY_ID,districts$NAME, sep='_') %in% names(reportedCases)] <- "#33D3FF"
+			
+		#q.style1 <- styleCat(prop="ID", val=seq(0,248), style.val=regionColours, lwd=1, leg="a")
+		
+		#q.map <- leaflet(data=q.dat, title=riskList[[i]]$name, base.map=list("positron", "darkmatter", "mqsat", "tls", "osm"), style=q.style1, popup="*", controls=list("zoom", "scale", "layer"))
+		#q.map
+		districts$risk <- vals
+	#	print("test")
+	}
+	districts$risk1 <- getVals(districts, riskList[[1]])
+	districts$risk2 <- getVals(districts, riskList[[2]])
+	districts$risk3 <- getVals(districts, riskList[[3]])
+	districts$risk4 <- getVals(districts, riskList[[4]])
+	districts$risk5 <- getVals(districts, riskList[[5]])
+	districts$risk6 <- getVals(districts, riskList[[6]])
+	districts$risk7 <- getVals(districts, riskList[[7]])
+	districts$risk8 <- getVals(districts, riskList[[8]])
+	districts$risk9 <- getVals(districts, riskList[[9]])
+	districts$risk10 <- getVals(districts, riskList[[10]])
+	districts$risk11 <- getVals(districts, riskList[[11]])
+	districts$risk12 <- getVals(districts, riskList[[12]])
+	q.dat <- toGeoJSON(data=districts, name="districts")	
+}
+
+getVals <- function(districts, risk) {
+	col_range <- seq(0, 1, length.out = 1000)
+	cols <- seqRamp('YlOrRd')(1000)
+	vals <- rep(NA, nrow(districts))
+	predictedRegions <- risk$predictedRegions
+	reportedCases <- risk$reportedCases
+	for(idx in 1:length(predictedRegions)) {	
+		vals[match(names(predictedRegions[idx]), paste(districts$COUNTRY_ID,districts$NAME, sep='_'))] <- predictedRegions[idx]
+	}
+	return(vals)
 }
 
 plotGlobalMap <- function (vals,
@@ -72,7 +117,8 @@ plotGlobalMap <- function (vals,
                      zlim = range(vals),
                      ramp = seqRamp(),
                      n = 1000,
-					 maptitle) {
+					 maptitle,
+					 dir_name=NA) {
   # get the colours
   col_range <- seq(zlim[1], zlim[2], length.out = n)
   cols <- ramp(n)
@@ -89,7 +135,13 @@ plotGlobalMap <- function (vals,
   vertical.image.legend(col=seqRamp('YlOrRd')(1000),zlim=c(0,1))
   title(main=maptitle)
   
-  #
+  if(!is.na(dir_name)) {
+	  countries$risk <- vals
+	  q.dat <- toGeoJSON(data=countries, dest=dir_name, name="countries")
+	  q.style <- styleCat(prop="ID", val=seq(0,248), style.val=countryColors, lwd=1, leg="a")
+	  q.map <- leaflet(data=q.dat, dest=dir_name, title="Regional Risk", base.map=list("positron", "darkmatter", "mqsat", "tls", "osm"), style=q.style, popup="*", controls=list("zoom", "scale", "layer"))
+	  q.map
+  }
   
 }
 
@@ -105,13 +157,16 @@ plotGlobalRisks <- function(risks, countries, all_countries, filename, maptitle)
 		vals[match(as.character(nonCoreRisks[idx,1]), countries$admin0_COU)] <- as.numeric(as.vector(nonCoreRisks[idx,2]))
 	}
 
-	png(filename=paste(filename, "large.png", sep="_"), width=8000, height=4000, units='px', pointsize=100)
+	newfilename <- paste(filename, "large.png", sep="_")
+	png(filename=newfilename, width=8000, height=4000, units='px', pointsize=100)
 	plotGlobalMap(vals,
 			countries,
 			all_countries,
 			zlim = c(0, 1),
 			ramp = seqRamp('YlOrRd'),
-			maptitle=maptitle)
+			maptitle=maptitle#,
+			#dir_name = dirname(newfilename)
+			)
 	dev.off()
 	png(filename=paste(filename, ".png", sep=""), width=800, height=400, units='px', pointsize=20)
 	plotGlobalMap(vals,
