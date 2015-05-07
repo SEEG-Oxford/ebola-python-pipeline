@@ -96,7 +96,7 @@ plotCompositeLeaflet <- function(districts, riskList) {
 	districts$risk10 <- getVals(districts, riskList[[10]])
 	districts$risk11 <- getVals(districts, riskList[[11]])
 	districts$risk12 <- getVals(districts, riskList[[12]])
-	q.dat <- toGeoJSON(data=districts, name="districts")	
+	q.dat <- toGeoJSON(data=districts, name="weighted-districts")	
 }
 
 getVals <- function(districts, risk) {

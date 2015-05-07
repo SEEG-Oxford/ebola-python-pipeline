@@ -197,9 +197,11 @@ class Pipeline(object):
 
             ## copy all geojson plots around
             shutil.copy(rcodedir + "/regional_results/Regional_Risk/districts.geojson", repopath + "/geojson/Regional_Risk/districts.geojson")
+            shutil.copy(rcodedir + "/regional_results/weighted-districts.geojson", repopath + "/geojson/Regional_Risk_Source/districts.geojson")
             shutil.copy(rcodedir + "/regional_results/Regional_Risk/Regional_Risk.html", repopath + "/geojson/Regional_Risk/Regional_Risk.html")
             call(["git", "add", repopath + "/geojson/Regional_Risk/Regional_Risk.html"], cwd=repopath)
             call(["git", "add", repopath + "/geojson/Regional_Risk/districts.geojson"], cwd=repopath)
+            call(["git", "add", repopath + "/geojson/Regional_Risk_Source/districts.geojson"], cwd=repopath)
 
             call(["git", "commit", "-m", "Updated WHO data and regional risk plots as of " + str(datetime.date.today())], cwd=repopath)
 
