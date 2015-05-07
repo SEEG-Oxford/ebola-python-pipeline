@@ -89,7 +89,10 @@ spainweighted_uniform <- spainuniformriskdata$predictedRegions * avgauc[12]
 # sum the weighted risks
 weighted_riskdata <- franceweighted_gravity + franceweighted_radiation + franceweighted_radsel + franceweighted_uniform + portugalweighted_gravity + portugalweighted_radiation + portugalweighted_radsel + portugalweighted_uniform + spainweighted_gravity + spainweighted_radiation + spainweighted_radsel + spainweighted_uniform
 # normalise 0..1
-weighted_riskdata <- weighted_riskdata / max(weighted_riskdata)
+# if the weightings are all zero then don't do anything (means AUC calculation was really bad)
+if(max(weighted_riskdata) > 0) {
+	weighted_riskdata <- weighted_riskdata / max(weighted_riskdata)
+}
 
 # plot
 plotRegionalRisks(districts, countries, country_borders, weighted_riskdata, francegravityriskdata$reportedCases, "Regional relative risk of Ebola importation\n using weighted prediction model data", "regional_prediction_weighted")
