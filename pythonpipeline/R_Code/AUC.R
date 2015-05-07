@@ -104,5 +104,8 @@ AUC<-function(d,pred,plot=FALSE,error_bars=FALSE,ci=0.95,res=100,add=FALSE,...)
       if(error_bars)
          add_error_bars(cbind(fp[2:(res+1)],tp[2:(res+1)]),error,dimensions=2,length=0.01)
    }
+   if(is.na(auc)) {
+	auc <- 0
+   }
    return(list(auc=auc,opt_thresh=opt_thresh))
 }
