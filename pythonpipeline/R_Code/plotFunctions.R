@@ -1,5 +1,6 @@
 require(aqfig)
 require(leafletR)
+require(rgeos)
 source('../palettes.R')
 
 plotRegionalMap <- function (vals,
@@ -118,7 +119,8 @@ plotGlobalMap <- function (vals,
                      ramp = seqRamp(),
                      n = 1000,
 					 maptitle,
-					 dir_name=NA) {
+					 dir_name=NA,
+					 filename) {
   # get the colours
   col_range <- seq(zlim[1], zlim[2], length.out = n)
   cols <- ramp(n)
@@ -128,6 +130,7 @@ plotGlobalMap <- function (vals,
   countryColors <- cols[bins]
   # special cases for LBR, SLE and GIN
   countryColors[grep("LBR|GIN|SLE", countries$admin0_COU)] <- "#33D3FF"
+  countryColors[is.na(countryColors)] <- grey(0.9)
   
   par(mar=c(1,1,2,2))
   plot(all_countries[-9,], col = grey(0.9))
@@ -136,10 +139,11 @@ plotGlobalMap <- function (vals,
   title(main=maptitle)
   
   if(!is.na(dir_name)) {
-	  countries$risk <- vals
+	  countries <- gSimplify(countries, tol=0.05, topologyPreserve=TRUE)
+	  #countries$risk <- vals
 	  q.dat <- toGeoJSON(data=countries, dest=dir_name, name="countries")
-	  q.style <- styleCat(prop="ID", val=seq(0,248), style.val=countryColors, lwd=1, leg="a")
-	  q.map <- leaflet(data=q.dat, dest=dir_name, title="Regional Risk", base.map=list("positron", "darkmatter", "mqsat", "tls", "osm"), style=q.style, popup="*", controls=list("zoom", "scale", "layer"))
+	  q.style <- styleCat(prop="ID", val=seq(0,190), style.val=countryColors, lwd=1, leg="a")
+	  q.map <- leaflet(data=q.dat, dest=dir_name, title=filename, base.map=list("positron", "darkmatter", "mqsat", "tls", "osm"), style=q.style, popup="*", controls=list("zoom", "scale", "layer"))
 	  q.map
   }
   
@@ -164,8 +168,9 @@ plotGlobalRisks <- function(risks, countries, all_countries, filename, maptitle)
 			all_countries,
 			zlim = c(0, 1),
 			ramp = seqRamp('YlOrRd'),
-			maptitle=maptitle#,
-			#dir_name = dirname(newfilename)
+			maptitle=maptitle,
+			dir_name = dirname(newfilename),
+			filename = filename
 			)
 	dev.off()
 	png(filename=paste(filename, ".png", sep=""), width=800, height=400, units='px', pointsize=20)
@@ -174,7 +179,8 @@ plotGlobalRisks <- function(risks, countries, all_countries, filename, maptitle)
 			all_countries,
 			zlim = c(0, 1),
 			ramp = seqRamp('YlOrRd'),
-			maptitle=maptitle)
+			maptitle=maptitle,
+			filename = filename)
 	dev.off()
 }
 
