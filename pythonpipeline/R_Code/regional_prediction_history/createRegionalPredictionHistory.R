@@ -96,7 +96,7 @@ mostRecent <- totalWeeks
 
 all_cdr_europe <- read.csv('../../data/all_cdr_europe.csv')
 
-cl <- makeCluster(8, outfile="out.log")
+cl <- makeCluster(32, outfile="out.log")
 registerDoParallel(cl)
 
 
@@ -104,6 +104,7 @@ aucmatrix <- foreach(idx=4:mostRecent,.combine=rbind) %dopar% {
 source('../palettes.R')
 source('../process_movement_data.R')
 require(aqfig)
+require(raster)
 	# 3 is france/gravity
 francegravityriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,3)]), idx, "France Gravity", auc=FALSE)
 
@@ -144,8 +145,7 @@ spainuniformriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,14)]), i
 aucs <- read.csv('../regional_results/aucdata.csv')
 # pull out the last 3
 latestaucs <- aucs[(idx-3):(idx-1),]
-print(idx)
-print(latestaucs)
+
 # get the average ignore NaNs, nulls etc
 avgauc <- colMeans(latestaucs [,c(-1:-2)], na.rm = TRUE)
 names(avgauc) <- predictionModelNames
