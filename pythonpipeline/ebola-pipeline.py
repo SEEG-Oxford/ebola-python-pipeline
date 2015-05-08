@@ -202,7 +202,7 @@ class Pipeline(object):
             shutil.copy(rcodedir + "/global_results/global_Adjacency_prediction/global_Adjacency_prediction.html", repopath + "/geojson/global_Adjacency_prediction.html")
             shutil.copy(rcodedir + "/global_results/global_Gravity_prediction/global_Gravity_prediction.html", repopath + "/geojson/global_Gravity_prediction.html")
             shutil.copy(rcodedir + "/global_results/global_Migration_prediction/global_Migration_prediction.html", repopath + "/geojson/global_Migration_prediction.html")
-            shutil.copy(rcodedir + "/global_results/global_Overall_prediction/global_Overall_prediction.html", repopath + "/geojson/global_Overall_prediction/global_Overall_prediction.html")
+            shutil.copy(rcodedir + "/global_results/global_Overall_prediction/global_Overall_prediction.html", repopath + "/geojson/global_Overall_prediction.html")
             shutil.copy(rcodedir + "/global_results/countries.geojson", repopath + "/geojson/countries.geojson")
             call(["git", "add", repopath + "/geojson/Regional_Risk/Regional_Risk.html"], cwd=repopath)
             call(["git", "add", repopath + "/geojson/Regional_Risk/districts.geojson"], cwd=repopath)
@@ -211,7 +211,7 @@ class Pipeline(object):
             call(["git", "add", repopath + "/geojson/global_Adjacency_prediction.html"], cwd=repopath)
             call(["git", "add", repopath + "/geojson/global_Gravity_prediction.html"], cwd=repopath)
             call(["git", "add", repopath + "/geojson/global_Migration_prediction.html"], cwd=repopath)
-            call(["git", "add", repopath + "/geojson/global_Overall_prediction/global_Overall_prediction.html"], cwd=repopath)
+            call(["git", "add", repopath + "/geojson/global_Overall_prediction.html"], cwd=repopath)
 
             call(["git", "commit", "-m", "Updated WHO data and regional risk plots as of " + str(datetime.date.today())], cwd=repopath)
 
