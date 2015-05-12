@@ -139,7 +139,9 @@ plotGlobalMap <- function (vals,
   title(main=maptitle)
   
   if(!is.na(dir_name)) {
+	  countryData <- countries@data
 	  countries <- gSimplify(countries, tol=0.05, topologyPreserve=TRUE)
+	  countries <- SpatialPolygonsDataFrame(countries, countryData, match.ID=FALSE)
 	  #countries$risk <- vals
 	  q.dat <- toGeoJSON(data=countries, dest=dir_name, name="countries")
 	  q.style <- styleCat(prop="ID", val=seq(0,190), style.val=countryColors, lwd=1, leg="a")
