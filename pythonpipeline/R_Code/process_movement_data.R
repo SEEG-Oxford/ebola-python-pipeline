@@ -78,7 +78,6 @@ getData <- function(raw_movement_matrix, endWeek, name, auc=TRUE) {
 	districtNames <- gsub("CIV_GOH", "CIV_GÔH", districtNames)
 	districtNames <- gsub("CIV_LOH_DJIBOUA", "CIV_LÔH_DJIBOUA", districtNames)
 
-
 	names(summedRegions) <- districtNames
 
 	# these are the "core" districts

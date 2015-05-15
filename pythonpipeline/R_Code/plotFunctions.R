@@ -73,17 +73,7 @@ plotCompositeLeaflet <- function(districts, riskList) {
 	for(i in 1:12) {
 		vals <- getVals(districts, riskList[[i]])
 		
-		#bins <- cut(vals, col_range, include.lowest = TRUE)
-		#regionColours <- cols[bins]
-		
-		#regionColours[paste(districts$COUNTRY_ID,districts$NAME, sep='_') %in% names(reportedCases)] <- "#33D3FF"
-			
-		#q.style1 <- styleCat(prop="ID", val=seq(0,248), style.val=regionColours, lwd=1, leg="a")
-		
-		#q.map <- leaflet(data=q.dat, title=riskList[[i]]$name, base.map=list("positron", "darkmatter", "mqsat", "tls", "osm"), style=q.style1, popup="*", controls=list("zoom", "scale", "layer"))
-		#q.map
 		districts$risk <- vals
-	#	print("test")
 	}
 	districts$risk1 <- getVals(districts, riskList[[1]])
 	districts$risk2 <- getVals(districts, riskList[[2]])

@@ -40,6 +40,3 @@ seqRamp <- function(name = c("YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds",
   return (ramp)
   
 }
-
-# pal <- divRamp()
-# plot(1:1000, pch = 16, cex = 5, col = pal(1000))

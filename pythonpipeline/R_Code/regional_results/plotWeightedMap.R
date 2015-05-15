@@ -17,8 +17,6 @@ dnames <- districts$NAME
 dnames[105] <- "MORONOU"
 districts$NAME <- dnames
 
-
-
 # the prediction models used
 predictionModelNames <- c("France Gravity", "France Original Radiation", "France Radiation With Selection", "France Uniform Selection","Portugal Gravity", "Portugal Original Radiation", "Portugal Radiation With Selection", "Portugal Uniform Selection","Spain Gravity", "Spain Original Radiation", "Spain Radiation With Selection", "Spain Uniform Selection")
 
@@ -96,6 +94,4 @@ if(max(weighted_riskdata) > 0) {
 
 # plot
 plotRegionalRisks(districts, countries, country_borders, weighted_riskdata, francegravityriskdata$reportedCases, "Regional relative risk of Ebola importation\n using weighted prediction model data", "regional_prediction_weighted")
-# print out the relative proportions of each prediction in the weighted map
-print((avgauc[1:12] / max(avgauc[1:12])) /sum(avgauc[1:12]))
 write.csv((avgauc[1:12] / max(avgauc[1:12])) /sum(avgauc[1:12]), "weightings.csv")

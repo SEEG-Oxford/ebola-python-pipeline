@@ -3,6 +3,8 @@
 # clear workspace
 rm(list = ls())
 
+createImages <- FALSE
+
 # data sources
 # 'http://apps.who.int/gho/data/view.ebola-sitrep.ebola-country-GIN-new-conf-prob-districs-20150121-data?lang=en'
 # 'http://apps.who.int/gho/data/view.ebola-sitrep.ebola-country-LBR-new-conf-prob-districs-20150121-data?lang=en'
@@ -30,7 +32,7 @@ all <- data.frame(country = all_raw$COUNTRY..CODE.,
                      week = all_raw$EPI_WEEK..CODE.,
                      number = all_raw$Numeric)
 
-# combine to get uniwque district names
+# combine to get unique district names
 all$country_district <- factor(paste(all$country,
                                      all$district,
                                      sep = '_'))
@@ -95,11 +97,12 @@ for (i in 1:nweek) {
 
 confirmed_probable <- confirmed + probable
 
-par(mfrow = c(1, 3))
-image(log1p(confirmed))
-image(log1p(probable))
-image(log1p(confirmed_probable))
-
+if(createImages) {
+	par(mfrow = c(1, 3))
+	image(log1p(confirmed))
+	image(log1p(probable))
+	image(log1p(confirmed_probable))
+}
 # fix column names as the WHO decided to rename FREETOWN to WESTERN AREA URBAN, whereas all the maps etc still list it as FREETOWN
 colnames(confirmed_probable) <- gsub("WESTERN AREA URBAN", "FREETOWN", colnames(confirmed_probable))
 colnames(confirmed_probable) <- gsub("WESTERN AREA RURAL", "WESTERN RURAL", colnames(confirmed_probable))
@@ -107,43 +110,35 @@ colnames(confirmed_probable) <- gsub("GIN_KISSIDOUGOU", "GIN_KISSIDOUGO", colnam
 # put the order back again
 confirmed_probable <- confirmed_probable[,order(colnames(confirmed_probable))]
 
-
-pal <- colorRampPalette(c(grey(0.9),
-                          'darkorange',
-                          'darkred'))
-par(mfrow = c(1, 1),
-    mar = c(3, 8, 3, 3))
-image(log1p(confirmed_probable),
-      col = pal(100),
-      axes = FALSE)
-title(main = 'New cases per week',
-      cex.main = 1.5,
-      line = 1,
-      col.main = grey(0.3))
-axis(1,
-     at = seq(0, 1, len = 5),
-     labels = weeks[ceiling(seq(1 / nweek, 1, len = 5) * nweek)],
-     las = 1,
-     tick = FALSE,
-     col.axis = grey(0.3))
-axis(2, at = seq(0, 1, len = ndistrict),
-     labels = districts,
-     cex.axis = 0.6,
-     las = 1,
-     line = -0.5,
-     col.axis = grey(0.3),
-     tick = FALSE)
-box(col = grey(0.7))
-abline(v = (ndistrict - 2) / ndistrict + 0.5 / ndistrict,
-       col = grey(0.5))
-# lines(x = 0:1,
-#       y = rep((which(substr(districts, 1, 3) == 'SLE')[1] - 0.5) / (ndistrict), 2), 
-#       lty = 1,
-#        col = grey(0.4))
-# lines(x = 0:1,
-#       y = rep((which(substr(districts, 1, 3) == 'LBR')[1] - 0.5) / (ndistrict), 2),
-#       lty = 1,
-#       col = grey(0.4))
-
+if(createImages) {
+	pal <- colorRampPalette(c(grey(0.9),
+							  'darkorange',
+							  'darkred'))
+	par(mfrow = c(1, 1),
+		mar = c(3, 8, 3, 3))
+	image(log1p(confirmed_probable),
+		  col = pal(100),
+		  axes = FALSE)
+	title(main = 'New cases per week',
+		  cex.main = 1.5,
+		  line = 1,
+		  col.main = grey(0.3))
+	axis(1,
+		 at = seq(0, 1, len = 5),
+		 labels = weeks[ceiling(seq(1 / nweek, 1, len = 5) * nweek)],
+		 las = 1,
+		 tick = FALSE,
+		 col.axis = grey(0.3))
+	axis(2, at = seq(0, 1, len = ndistrict),
+		 labels = districts,
+		 cex.axis = 0.6,
+		 las = 1,
+		 line = -0.5,
+		 col.axis = grey(0.3),
+		 tick = FALSE)
+	box(col = grey(0.7))
+	abline(v = (ndistrict - 2) / ndistrict + 0.5 / ndistrict,
+		   col = grey(0.5))
+}
 
 write.csv(confirmed_probable, file = 'EVD_conf_prob_.csv')

@@ -19,8 +19,6 @@ dnames <- districts$NAME
 dnames[105] <- "MORONOU"
 districts$NAME <- dnames
 
-
-
 # the prediction models used
 predictionModelNames <- c("France Gravity", "France Original Radiation", "France Radiation With Selection", "France Uniform Selection","Portugal Gravity", "Portugal Original Radiation", "Portugal Radiation With Selection", "Portugal Uniform Selection","Spain Gravity", "Spain Original Radiation", "Spain Radiation With Selection", "Spain Uniform Selection")
 
@@ -28,10 +26,6 @@ predictionModelNames <- c("France Gravity", "France Original Radiation", "France
 totalWeeks <- nrow(allcasedata)
 # In order to calculate the AUC we need to not include the last week in the prediction
 mostRecent <- totalWeeks
-
-# For the current state we need to +1 the mostRecent value as we are wanting
-# to create risk data for the coming week (i.e. predict the future) rather
-# than comparing the predicted risk with the known data for subsequent weeks
 
 all_cdr_europe <- read.csv('../../data/all_cdr_europe.csv')
 west_africa_gravity <- read.csv('../../data/gravity.csv')
@@ -93,9 +87,8 @@ plotCompositeLeaflet(districts, list(riskdata1,riskdata2,riskdata3,riskdata4,ris
 cl <- makeCluster(8)
 registerDoParallel(cl)
 
-
 aucmatrix <- foreach(idx=1:mostRecent,.combine=rbind) %dopar% {
-	# we need to manually track the indices if using a parallel library
+	# we sometimes(?) need to manually track the indices if using a parallel library
 	aucresult <- vector()
 	aucresult[1] <- idx
 	# 3 is france/gravity
@@ -168,7 +161,6 @@ aucmatrix <- foreach(idx=1:mostRecent,.combine=rbind) %dopar% {
 	aucresult
 }
 stopCluster(cl)
-
 
 colnames(aucmatrix) <- c("Week index", predictionModelNames, "West Africa Gravity")
 
