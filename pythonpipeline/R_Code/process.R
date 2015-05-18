@@ -23,6 +23,10 @@ allCountries <- shapefile('../data/shapefiles/admin2013_0.shp')
 # fix an error in districts where CIV has 2 regions named BELIER. One should be MORONOU
 dnames <- districts$NAME
 dnames[105] <- "MORONOU"
+dnames <- gsub("GBÊKE", "GBEKE", dnames)
+dnames <- gsub("GBÔKLE", "GBOKLE", dnames)
+dnames <- gsub("GÔH", "GOH", dnames)
+dnames <- gsub("LÔH_DJIBOUA","LOH_DJIBOUA",  dnames)
 districts$NAME <- dnames
 
 # read in the existing movement predictions (based on europe and west africa cdr data)
@@ -39,6 +43,36 @@ additionalcasedata <- read.csv('../data/EVD_conf_prob_additional.csv')
 
 # combine the real case data with the additional case data
 allcasedata <- evdcasedata + additionalcasedata
+
+## prepare the region names in the case data files
+districtNames <- names(allcasedata)
+districtNames <- gsub("[.]", "_", districtNames)
+districtNames <- gsub("\\s", "_", districtNames)
+districtNames <- gsub("'", "_", districtNames)
+# Correct names of certain regions which are different in the shapefile
+districtNames <- gsub("LBR_RIVER_GEE", "LBR_RIVER_GHEE", districtNames)
+districtNames <- gsub("CIV_GBEKE", "CIV_GBÊKE", districtNames)
+districtNames <- gsub("CIV_GBOKLE", "CIV_GBÔKLE", districtNames)
+districtNames <- gsub("CIV_GOH", "CIV_GÔH", districtNames)
+districtNames <- gsub("CIV_LOH_DJIBOUA", "CIV_LÔH_DJIBOUA", districtNames)
+names(allcasedata) <- districtNames
+
+## prepare the region names in the west africa gravity file
+districtNames <- west_africa_gravity$admin2_from
+districtNames <- gsub("[.]", "_", districtNames)
+districtNames <- gsub("\\s", "_", districtNames)
+districtNames <- gsub("'", "_", districtNames)
+# Correct names of certain regions which are different in the shapefile
+districtNames <- gsub("LBR_RIVER_GEE", "LBR_RIVER_GHEE", districtNames)
+west_africa_gravity$admin2_from <- districtNames
+
+districtNames <- west_africa_gravity$admin2_to
+districtNames <- gsub("[.]", "_", districtNames)
+districtNames <- gsub("\\s", "_", districtNames)
+districtNames <- gsub("'", "_", districtNames)
+# Correct names of certain regions which are different in the shapefile
+districtNames <- gsub("LBR_RIVER_GEE", "LBR_RIVER_GHEE", districtNames)
+west_africa_gravity$admin2_to <- districtNames
 
 # get the index of the most recent week of data
 mostRecent <- nrow(allcasedata)

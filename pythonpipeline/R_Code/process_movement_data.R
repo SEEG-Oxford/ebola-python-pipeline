@@ -29,24 +29,6 @@ getData <- function(raw_movement_matrix, endWeek, name, auc=TRUE) {
 	if (startWeek < 1) startWeek <- 0
 	casedata <- colSums(allcasedata[c(startWeek:(endWeek-1)),][,-1])
 	
-	
-	## prepare the region names
-	districtNames <- names(casedata)
-
-	districtNames <- gsub("[.]", "_", districtNames)
-	districtNames <- gsub("\\s", "_", districtNames)
-	districtNames <- gsub("'", "_", districtNames)
-
-	# Correct names of certain regions which are different in the shapefile
-	districtNames <- gsub("LBR_RIVER_GEE", "LBR_RIVER_GHEE", districtNames)
-	districtNames <- gsub("CIV_GBEKE", "CIV_GBÊKE", districtNames)
-	districtNames <- gsub("CIV_GBOKLE", "CIV_GBÔKLE", districtNames)
-	districtNames <- gsub("CIV_GOH", "CIV_GÔH", districtNames)
-	districtNames <- gsub("CIV_LOH_DJIBOUA", "CIV_LÔH_DJIBOUA", districtNames)
-
-
-	names(casedata) <- districtNames
-
 	for(idx in 1:nrow(raw_movement_matrix)) {
 		nametofind <- gsub("\\s", ".", row.names(raw_movement_matrix)[idx])
 		casecount <- casedata[match(nametofind, gsub("[.]","_",names(casedata)))]
@@ -58,31 +40,8 @@ getData <- function(raw_movement_matrix, endWeek, name, auc=TRUE) {
 	summedRegions[is.na(summedRegions)] <- 0
 	summedRegions <- summedRegions / max(summedRegions)
 
-	## prepare the region names
-	districtNames <- names(summedRegions)
-
-	districtNames <- gsub("\\s", "_", districtNames)
-	districtNames <- gsub("'", "_", districtNames)
-
-	# Correct names of certain regions which are different in the shapefile
-	districtNames <- gsub("RIVER_GEE", "RIVER_GHEE", districtNames)
-	districtNames <- gsub("CIV_GBEKE", "CIV_GBÊKE", districtNames)
-	districtNames <- gsub("CIV_GBOKLE", "CIV_GBÔKLE", districtNames)
-	districtNames <- gsub("CIV_GOH", "CIV_GÔH", districtNames)
-	districtNames <- gsub("CIV_LOH_DJIBOUA", "CIV_LÔH_DJIBOUA", districtNames)
-
-	names(summedRegions) <- districtNames
-
 	# these are the "core" districts
 	reportedCases <- casedata[casedata > 0]
-	reportedNames <- names(reportedCases)
-	reportedNames <- gsub("\\s", "_", reportedNames)
-	reportedNames <- gsub("'", "_", reportedNames)
-	reportedNames <- gsub("[.]", "_", reportedNames)
-
-	# Correct names of certain regions which are different in the core dataset
-	reportedNames <- gsub("RIVER_GEE", "RIVER_GHEE", reportedNames)
-	names(reportedCases) <- reportedNames
 
 	predictedRegions <- summedRegions[!(names(summedRegions) %in% names(reportedCases))]
 	predictedRegions = predictedRegions / max(predictedRegions)
@@ -115,31 +74,8 @@ getSimpleData <- function(endWeek) {
 	if(startWeek < 0) startWeek <- 0
 	casedata <- colSums(allcasedata[c(startWeek:endWeek),][,-1])
 	
-	
-	## prepare the region names
-	districtNames <- names(casedata)
-
-	districtNames <- gsub("[.]", "_", districtNames)
-	districtNames <- gsub("\\s", "_", districtNames)
-	districtNames <- gsub("'", "_", districtNames)
-
-	# Correct names of certain regions which are different in the shapefile
-	districtNames <- gsub("LBR_RIVER_GEE", "LBR_RIVER_GHEE", districtNames)
-	districtNames <- gsub("CIV_GBEKE", "CIV_GBÊKE", districtNames)
-	districtNames <- gsub("CIV_GBOKLE", "CIV_GBÔKLE", districtNames)
-	districtNames <- gsub("CIV_GOH", "CIV_GÔH", districtNames)
-	districtNames <- gsub("CIV_LOH_DJIBOUA", "CIV_LÔH_DJIBOUA", districtNames)
-
-
-	names(casedata) <- districtNames
-
 	# these are the "core" districts
 	reportedCases <- casedata[casedata > 0]
-	reportedNames <- names(reportedCases)
-	reportedNames <- gsub("\\s", "_", reportedNames)
-	reportedNames <- gsub("'", "_", reportedNames)
-	reportedNames <- gsub("[.]", "_", reportedNames)
-	names(reportedCases) <- reportedNames
 	
 	return (reportedCases)
 }
