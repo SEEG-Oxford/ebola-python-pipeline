@@ -1,31 +1,5 @@
 # functions (and examples) to plot maps of human movement and EVD spread
 
-# load packages
-require(raster)
-require(SDMTools)
-require(rgdal)
-source('../process_movement_data.R')
-source('../plotFunctions.R')
-
-# load shapefiles
-districts <- shapefile('../../data/shapefiles/ad2_FINAL.shp')
-countries <- shapefile('../../data/shapefiles/countries_wa.shp')
-country_borders <- shapefile('../../data/shapefiles/country_borders_wa.shp')
-
-# fix an error in districts where CIV has 2 regions named BELIER. One should be MORONOU
-dnames <- districts$NAME
-dnames[105] <- "MORONOU"
-districts$NAME <- dnames
-
-# the prediction models used
-predictionModelNames <- c("France Gravity", "France Original Radiation", "France Radiation With Selection", "France Uniform Selection","Portugal Gravity", "Portugal Original Radiation", "Portugal Radiation With Selection", "Portugal Uniform Selection","Spain Gravity", "Spain Original Radiation", "Spain Radiation With Selection", "Spain Uniform Selection")
-
-# get total number of weeks of data
-totalWeeks <- nrow(allcasedata)
-mostRecent <- totalWeeks
-
-all_cdr_europe <- read.csv('../../data/all_cdr_europe.csv')
-
 # 3 is france/gravity
 francegravityriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,3)]), mostRecent, "France Gravity", auc=FALSE)
 
@@ -63,7 +37,7 @@ spainradselriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,11)]), mo
 spainuniformriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,14)]), mostRecent, "Spain Uniform", auc=FALSE)
 
 # read all aucs
-aucs <- read.csv('aucdata.csv')
+aucs <- read.csv('regional_results/aucdata.csv')
 # pull out the last 3
 latestaucs <- tail(aucs,3)
 # get the average ignore NaNs, nulls etc
@@ -94,4 +68,4 @@ if(max(weighted_riskdata) > 0) {
 
 # plot
 plotRegionalRisks(districts, countries, country_borders, weighted_riskdata, francegravityriskdata$reportedCases, "Regional relative risk of Ebola importation\n using weighted prediction model data", "regional_prediction_weighted")
-write.csv((avgauc[1:12] / max(avgauc[1:12])) /sum(avgauc[1:12]), "weightings.csv")
+write.csv((avgauc[1:12] / max(avgauc[1:12])) /sum(avgauc[1:12]), "regional_results/weightings.csv")

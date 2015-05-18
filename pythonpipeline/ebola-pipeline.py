@@ -8,7 +8,6 @@ import sys
 import getopt
 import os
 import urllib2
-import re
 import csv
 import shutil
 import glob

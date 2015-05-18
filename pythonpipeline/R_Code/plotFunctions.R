@@ -1,7 +1,7 @@
 require(aqfig)
 require(leafletR)
 require(rgeos)
-source('../palettes.R')
+source('palettes.R')
 
 plotRegionalMap <- function (vals,
                      districts,

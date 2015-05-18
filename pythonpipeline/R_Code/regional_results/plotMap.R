@@ -1,35 +1,5 @@
 # functions (and examples) to plot maps of human movement and EVD spread
 
-# load packages
-require(raster)
-require(SDMTools)
-require(rgdal)
-require(foreach)
-require(doParallel)
-source('../process_movement_data.R')
-source('../plotFunctions.R')
-
-# load shapefiles
-districts <- shapefile('../../data/shapefiles/ad2_FINAL.shp')
-countries <- shapefile('../../data/shapefiles/countries_wa.shp')
-country_borders <- shapefile('../../data/shapefiles/country_borders_wa.shp')
-
-# fix an error in districts where CIV has 2 regions named BELIER. One should be MORONOU
-dnames <- districts$NAME
-dnames[105] <- "MORONOU"
-districts$NAME <- dnames
-
-# the prediction models used
-predictionModelNames <- c("France Gravity", "France Original Radiation", "France Radiation With Selection", "France Uniform Selection","Portugal Gravity", "Portugal Original Radiation", "Portugal Radiation With Selection", "Portugal Uniform Selection","Spain Gravity", "Spain Original Radiation", "Spain Radiation With Selection", "Spain Uniform Selection")
-
-# get total number of weeks of data
-totalWeeks <- nrow(allcasedata)
-# In order to calculate the AUC we need to not include the last week in the prediction
-mostRecent <- totalWeeks
-
-all_cdr_europe <- read.csv('../../data/all_cdr_europe.csv')
-west_africa_gravity <- read.csv('../../data/gravity.csv')
-
 # 3 is france/gravity
 riskdata1 <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,3)]), mostRecent, "France Gravity", auc=FALSE)
 plotRegionalRisks(districts, countries, country_borders, riskdata1$predictedRegions, riskdata1$reportedCases, "Regional relative risk of Ebola importation\n using gravity model from France", "regional_prediction_gravity_france", FALSE)
@@ -164,4 +134,4 @@ stopCluster(cl)
 
 colnames(aucmatrix) <- c("Week index", predictionModelNames, "West Africa Gravity")
 
-write.csv(aucmatrix, "aucdata.csv")
+write.csv(aucmatrix, "regional_results/aucdata.csv")

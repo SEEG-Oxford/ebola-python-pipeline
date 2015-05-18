@@ -1,15 +1,5 @@
 # functions (and examples) to plot maps of human movement and EVD spread
 
-# load packages
-require(raster)
-require(SDMTools)
-require(rgdal)
-require(aqfig)
-require(foreach)
-require(doParallel)
-source('../palettes.R')
-source('../process_movement_data.R')
-
 plotMap <- function (vals,
                      districts,
                      countries,
@@ -57,33 +47,12 @@ plotRisks <- function(districts, countries, country_borders, predictedRegions, r
 	dev.off()
 }
 
-# load shapefiles
-districts <- shapefile('../../data/shapefiles/ad2_FINAL.shp')
-countries <- shapefile('../../data/shapefiles/countries_wa.shp')
-country_borders <- shapefile('../../data/shapefiles/country_borders_wa.shp')
-
-# fix an error in districts where CIV has 2 regions named BELIER. One should be MORONOU
-dnames <- districts$NAME
-dnames[105] <- "MORONOU"
-districts$NAME <- dnames
-
-# the prediction models used
-predictionModelNames <- c("France Gravity", "France Original Radiation", "France Radiation With Selection", "France Uniform Selection","Portugal Gravity", "Portugal Original Radiation", "Portugal Radiation With Selection", "Portugal Uniform Selection","Spain Gravity", "Spain Original Radiation", "Spain Radiation With Selection", "Spain Uniform Selection")
-
-# get total number of weeks of data
-totalWeeks <- nrow(allcasedata)
-# In order to calculate the AUC we need to not include the last week in the prediction
-mostRecent <- totalWeeks
-
-all_cdr_europe <- read.csv('../../data/all_cdr_europe.csv')
-
-cl <- makeCluster(32, outfile="out.log")
+cl <- makeCluster(8, outfile="out.log")
 registerDoParallel(cl)
 
-
 aucmatrix <- foreach(idx=4:mostRecent,.combine=rbind) %dopar% {
-	source('../palettes.R')
-	source('../process_movement_data.R')
+	source('palettes.R')
+	source('process_movement_data.R')
 	require(aqfig)
 	require(raster)
 	# 3 is france/gravity
@@ -123,7 +92,7 @@ aucmatrix <- foreach(idx=4:mostRecent,.combine=rbind) %dopar% {
 	spainuniformriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,14)]), idx, "Spain Uniform", auc=FALSE)
 
 	# read all aucs
-	aucs <- read.csv('../regional_results/aucdata.csv')
+	aucs <- read.csv('regional_results/aucdata.csv')
 	# pull out the last 3
 	latestaucs <- aucs[(idx-3):(idx-1),]
 

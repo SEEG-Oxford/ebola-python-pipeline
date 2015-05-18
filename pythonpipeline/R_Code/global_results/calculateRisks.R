@@ -1,10 +1,10 @@
-all <- read.csv('../../data/all.csv')
+all <- read.csv('../data/all.csv')
 
 #define prevalence frome some other sheet 
-allcasedata <- read.csv('../../data/EVD_conf_prob_.csv')
+allcasedata <- read.csv('../data/EVD_conf_prob_.csv')
 # this must be exactly the same format as allcasedata and will also need curating
 # when cases move from the sitrep to the patientdb
-additionalcasedata <- read.csv('../../data/EVD_conf_prob_additional.csv')
+additionalcasedata <- read.csv('../data/EVD_conf_prob_additional.csv')
 
 allcasedata <- allcasedata + additionalcasedata
 

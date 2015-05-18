@@ -1,11 +1,4 @@
-source("../AUC.R")
-# n= number of weeks data to read from the end of the file
-allcasedata <- read.csv('../../data/EVD_conf_prob_.csv')
-# this must be exactly the same format as allcasedata and will also need curating
-# when cases move from the sitrep to the patientdb
-additionalcasedata <- read.csv('../../data/EVD_conf_prob_additional.csv')
-
-allcasedata <- allcasedata + additionalcasedata
+source("AUC.R")
 
 # helper function
 as.movementmatrix <- function(dataframe) {
@@ -94,9 +87,9 @@ getData <- function(raw_movement_matrix, endWeek, name, auc=TRUE) {
 	predictedRegions <- summedRegions[!(names(summedRegions) %in% names(reportedCases))]
 	predictedRegions = predictedRegions / max(predictedRegions)
 	# these are the regions we have case data for, so we want to see how accurate the predictions are
-	write.csv(t(summedRegions[grep("GIN|LBR|SLE", names(summedRegions))]), paste("historical/data/core_risk_week", startWeek, name, ".csv", sep="_"))
+	#write.csv(t(summedRegions[grep("GIN|LBR|SLE", names(summedRegions))]), paste("regional_prediction_history/historical/data/core_risk_week", startWeek, name, ".csv", sep="_"))
 	# these are the risks for the non-core regions
-	write.csv(t(predictedRegions), paste("historical/data/non-core_risk_week", startWeek, name, ".csv", sep="_"))
+	#write.csv(t(predictedRegions), paste("regional_prediction_history/historical/data/non-core_risk_week", startWeek, name, ".csv", sep="_"))
 	
 	if(auc) {
 		# calculate AUC
@@ -146,6 +139,7 @@ getSimpleData <- function(endWeek) {
 	reportedNames <- gsub("\\s", "_", reportedNames)
 	reportedNames <- gsub("'", "_", reportedNames)
 	reportedNames <- gsub("[.]", "_", reportedNames)
+	names(reportedCases) <- reportedNames
 	
 	return (reportedCases)
 }
