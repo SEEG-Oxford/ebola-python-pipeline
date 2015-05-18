@@ -50,11 +50,9 @@ plotRisks <- function(districts, countries, country_borders, predictedRegions, r
 cl <- makeCluster(8, outfile="out.log")
 registerDoParallel(cl)
 
-aucmatrix <- foreach(idx=4:mostRecent,.combine=rbind) %dopar% {
+aucmatrix <- foreach(idx=4:mostRecent,.combine=rbind, .packages=c("aqfig", "raster")) %dopar% {
 	source('palettes.R')
 	source('process_movement_data.R')
-	require(aqfig)
-	require(raster)
 	# 3 is france/gravity
 	francegravityriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,3)]), idx, "France Gravity", auc=FALSE)
 

@@ -3,8 +3,7 @@
 cl <- makeCluster(8, outfile="out.log")
 registerDoParallel(cl)
 
-aucmatrix <- foreach(idx=1:mostRecent,.combine=rbind) %dopar% {	
-	require(aqfig)
+aucmatrix <- foreach(idx=1:mostRecent,.combine=rbind, .packages=c("aqfig")) %dopar% {
 	# plot
 	rawdate <- paste(gsub("-W", " ", as.character(evdcasedata[idx,1])), "1", sep=" ")
 	formattedDate <- format(as.POSIXct(rawdate, format="%Y %U %u"), format="%B %d %Y")
