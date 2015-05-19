@@ -1,7 +1,6 @@
 # functions (and examples) to plot maps of human movement and EVD spread
 
 # 3 is france/gravity
-movementMatrices[,,1]
 riskdata1 <- getData(movementMatrices[,,1], mostRecent, "France Gravity", auc=FALSE)
 plotRegionalRisks(districts, countries, country_borders, riskdata1$predictedRegions, riskdata1$reportedCases, "Regional relative risk of Ebola importation\n using gravity model from France", "regional_prediction_gravity_france", FALSE)
 
