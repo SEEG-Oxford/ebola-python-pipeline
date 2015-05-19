@@ -79,16 +79,23 @@ west_africa_gravity$admin2_to <- districtNames
 mostRecent <- nrow(allcasedata)
 
 # the prediction models used
-predictionModelNames <- c("France Gravity", "France Original Radiation", "France Radiation With Selection", "France Uniform Selection","Portugal Gravity", "Portugal Original Radiation", "Portugal Radiation With Selection", "Portugal Uniform Selection","Spain Gravity", "Spain Original Radiation", "Spain Radiation With Selection", "Spain Uniform Selection")
+predictionModelNames <- c("France Gravity", "France Original Radiation", "France Radiation With Selection", "France Uniform Selection","Portugal Gravity", "Portugal Original Radiation", "Portugal Radiation With Selection", "Portugal Uniform Selection","Spain Gravity", "Spain Original Radiation", "Spain Radiation With Selection", "Spain Uniform Selection", "West Africa Gravity")
+
+# titles to be displayed on the regional risk maps
+regionalRiskTitles <- c("Regional relative risk of Ebola importation\n using gravity model from France", "Regional relative risk of Ebola importation\n using original radiation model from France", "Regional relative risk of Ebola importation\n using radiation with selection model from France", "Regional relative risk of Ebola importation\n using uniform selection model from France", "Regional relative risk of Ebola importation\n using gravity model from Portugal", "Regional relative risk of Ebola importation\n using original radiation model from Portugal", "Regional relative risk of Ebola importation\n using radiation with selection model from Portugal", "Regional relative risk of Ebola importation\n using uniform selection model from Portugal", "Regional relative risk of Ebola importation\n using gravity model from Spain", "Regional relative risk of Ebola importation\n using original radiation model from Spain", "Regional relative risk of Ebola importation\n using radiation with selection model from Spain", "Regional relative risk of Ebola importation\n using uniform selection model from Spain", "Regional relative risk of Ebola importation\n using West Africa gravity model")
 
 # pre-calculate all the movement matrices
 cl <- makeCluster(8)
 registerDoParallel(cl)
 
+# for this to work the results of as.movementmatrix must be of the same dimensions. For this reason the west_africa_gravity dataset cannot be combined with the other movement models as it doesn't extend
+# to many of the other surrounding countries
 movementMatrices <- foreach(idx=3:14, .combine = function(...) abind(..., along=3)) %dopar% {
 	as.movementmatrix(all_cdr_europe[,c(1,2,idx)])
 }
 stopCluster(cl)
+# we can't do this (see above)
+#movementMatrices <- abind(movementMatrices, as.movementmatrix(west_africa_gravity[,c(8,14,19)]), along=3)
 
 print("Plotting regional results")
 source("regional_results/plotMap.R")
