@@ -5,6 +5,7 @@ require(rgdal)
 require(foreach)
 require(doParallel)
 require(aqfig)
+require(abind)
 
 # load required helper functions
 print("Loading helper functions")
@@ -79,6 +80,15 @@ mostRecent <- nrow(allcasedata)
 
 # the prediction models used
 predictionModelNames <- c("France Gravity", "France Original Radiation", "France Radiation With Selection", "France Uniform Selection","Portugal Gravity", "Portugal Original Radiation", "Portugal Radiation With Selection", "Portugal Uniform Selection","Spain Gravity", "Spain Original Radiation", "Spain Radiation With Selection", "Spain Uniform Selection")
+
+# pre-calculate all the movement matrices
+cl <- makeCluster(8)
+registerDoParallel(cl)
+
+movementMatrices <- foreach(idx=3:14, .combine = function(...) abind(..., along=3)) %dopar% {
+	as.movementmatrix(all_cdr_europe[,c(1,2,idx)])
+}
+stopCluster(cl)
 
 print("Plotting regional results")
 source("regional_results/plotMap.R")

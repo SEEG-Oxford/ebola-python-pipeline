@@ -54,40 +54,40 @@ aucmatrix <- foreach(idx=4:mostRecent,.combine=rbind, .packages=c("aqfig", "rast
 	source('palettes.R')
 	source('process_movement_data.R')
 	# 3 is france/gravity
-	francegravityriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,3)]), idx, "France Gravity", auc=FALSE)
+	francegravityriskdata <- getData(movementMatrices[,,1], idx, "France Gravity", auc=FALSE)
 
 	# 6 is france/radiation
-	franceradiationriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,6)]), idx, "France Original Radiation", auc=FALSE)
+	franceradiationriskdata <- getData(movementMatrices[,,4], idx, "France Original Radiation", auc=FALSE)
 
 	# 9 is france/radiation-with-selection
-	franceradselriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,9)]), idx, "France Radiation with Selection", auc=FALSE)
+	franceradselriskdata <- getData(movementMatrices[,,7], idx, "France Radiation with Selection", auc=FALSE)
 
 	# 12 is france/uniform
-	franceuniformriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,12)]), idx, "France Uniform", auc=FALSE)
+	franceuniformriskdata <- getData(movementMatrices[,,10], idx, "France Uniform", auc=FALSE)
 
 	# 4 is portugal/gravity
-	portugalgravityriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,4)]), idx, "Portugal Gravity", auc=FALSE)
+	portugalgravityriskdata <- getData(movementMatrices[,,2], idx, "Portugal Gravity", auc=FALSE)
 
 	# 7 is portugal/radiation
-	portugalradiationriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,7)]), idx, "Portugal Original Radiation", auc=FALSE)
+	portugalradiationriskdata <- getData(movementMatrices[,,5], idx, "Portugal Original Radiation", auc=FALSE)
 
 	# 10 is portugal/radiation-with-selection
-	portugalradselriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,10)]), idx, "Portugal Radiation with Selection", auc=FALSE)
+	portugalradselriskdata <- getData(movementMatrices[,,8], idx, "Portugal Radiation with Selection", auc=FALSE)
 
 	# 13 is portugal/uniform
-	portugaluniformriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,13)]), idx, "Portugal Uniform", auc=FALSE)
+	portugaluniformriskdata <- getData(movementMatrices[,,11], idx, "Portugal Uniform", auc=FALSE)
 
 	# 5 is spain/gravity
-	spaingravityriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,5)]), idx, "Spain Gravity", auc=FALSE)
+	spaingravityriskdata <- getData(movementMatrices[,,3], idx, "Spain Gravity", auc=FALSE)
 
 	# 8 is spain/radiation
-	spainradiationriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,8)]), idx, "Spain Original Radiation", auc=FALSE)
+	spainradiationriskdata <- getData(movementMatrices[,,6], idx, "Spain Original Radiation", auc=FALSE)
 
 	# 11 is spain/radiation-with-selection
-	spainradselriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,11)]), idx, "Spain Radiation with Selection", auc=FALSE)
+	spainradselriskdata <- getData(movementMatrices[,,9], idx, "Spain Radiation with Selection", auc=FALSE)
 
 	# 14 is spain/uniform
-	spainuniformriskdata <- getData(as.movementmatrix(all_cdr_europe[,c(1,2,14)]), idx, "Spain Uniform", auc=FALSE)
+	spainuniformriskdata <- getData(movementMatrices[,,12], idx, "Spain Uniform", auc=FALSE)
 
 	# read all aucs
 	aucs <- read.csv('regional_results/aucdata.csv')
