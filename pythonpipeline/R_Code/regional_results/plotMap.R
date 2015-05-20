@@ -21,10 +21,10 @@ calculateAUCMatrix <- function(movementMatrices, predictionModelNames, allCaseDa
 	cl <- makeCluster(8)
 	registerDoParallel(cl)
 
-	aucmatrix <- foreach(idx=1:mostRecent,.combine=rbind, .export=c("getData")) %dopar% {
+	aucmatrix <- foreach(idx=1:mostRecent,.combine="rbind", .export=c("getData")) %dopar% {
 		source("AUC.R")
 		# we sometimes(?) need to manually track the indices if using a parallel library
-		aucresult <- vector()
+		aucresult <- numeric()
 		aucresult[1] <- idx
 		for (i in 1:riskModelCount) {
 			riskdata1 <- getData(movementMatrices[,,i], idx, predictionModelNames[i], allCaseData)
@@ -35,5 +35,6 @@ calculateAUCMatrix <- function(movementMatrices, predictionModelNames, allCaseDa
 	}
 	stopCluster(cl)
 
+	aucmatrix <- matrix(as.numeric(unlist(aucmatrix)),nrow=nrow(aucmatrix))
 	return(aucmatrix)
 }
