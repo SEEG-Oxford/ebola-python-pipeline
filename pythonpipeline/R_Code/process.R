@@ -79,10 +79,23 @@ west_africa_gravity$admin2_to <- districtNames
 mostRecent <- nrow(allcasedata)
 
 # the prediction models used
-predictionModelNames <- c("France Gravity", "France Original Radiation", "France Radiation With Selection", "France Uniform Selection","Portugal Gravity", "Portugal Original Radiation", "Portugal Radiation With Selection", "Portugal Uniform Selection","Spain Gravity", "Spain Original Radiation", "Spain Radiation With Selection", "Spain Uniform Selection", "West Africa Gravity")
+predictionModelNames <- c("France Gravity", "Portugal Gravity", "Spain Gravity", "France Original Radiation", "Portugal Original Radiation", "Spain Original Radiation", "France Radiation With Selection", "Portugal Radiation With Selection", "Spain Radiation With Selection", "France Uniform Selection", "Portugal Uniform Selection", "Spain Uniform Selection", "West Africa Gravity")
 
 # titles to be displayed on the regional risk maps
-regionalRiskTitles <- c("Regional relative risk of Ebola importation\n using gravity model from France", "Regional relative risk of Ebola importation\n using original radiation model from France", "Regional relative risk of Ebola importation\n using radiation with selection model from France", "Regional relative risk of Ebola importation\n using uniform selection model from France", "Regional relative risk of Ebola importation\n using gravity model from Portugal", "Regional relative risk of Ebola importation\n using original radiation model from Portugal", "Regional relative risk of Ebola importation\n using radiation with selection model from Portugal", "Regional relative risk of Ebola importation\n using uniform selection model from Portugal", "Regional relative risk of Ebola importation\n using gravity model from Spain", "Regional relative risk of Ebola importation\n using original radiation model from Spain", "Regional relative risk of Ebola importation\n using radiation with selection model from Spain", "Regional relative risk of Ebola importation\n using uniform selection model from Spain", "Regional relative risk of Ebola importation\n using West Africa gravity model")
+regionalRiskTitles <- c(
+"Regional relative risk of Ebola importation\n using gravity model from France", 
+"Regional relative risk of Ebola importation\n using gravity model from Portugal", 
+"Regional relative risk of Ebola importation\n using gravity model from Spain", 
+"Regional relative risk of Ebola importation\n using original radiation model from France",
+"Regional relative risk of Ebola importation\n using original radiation model from Portugal", 
+"Regional relative risk of Ebola importation\n using original radiation model from Spain", 
+"Regional relative risk of Ebola importation\n using radiation with selection model from France", 
+"Regional relative risk of Ebola importation\n using radiation with selection model from Portugal", 
+"Regional relative risk of Ebola importation\n using radiation with selection model from Spain", 
+"Regional relative risk of Ebola importation\n using uniform selection model from France", 
+"Regional relative risk of Ebola importation\n using uniform selection model from Portugal", 
+"Regional relative risk of Ebola importation\n using uniform selection model from Spain", 
+"Regional relative risk of Ebola importation\n using West Africa gravity model")
 
 # pre-calculate all the movement matrices
 cl <- makeCluster(8)
