@@ -110,15 +110,6 @@ stopCluster(cl)
 
 print("Plotting regional results")
 source("regional_results/plotMap.R")
-print("Plotting weighted regional results")
-source("regional_results/plotWeightedMap.R")
-print("Plotting global risk map")
-source("global_results/plotMap.R")
-print("Plotting regional case history maps")
-source("regional_case_history/createRegionalCaseHistoryPlots.R")
-print("Plotting regional prediction history maps")
-source("regional_prediction_history/createRegionalPredictionHistory.R")
-print("Done")
 riskData <- plotAllRegionalRisks(movementMatrices, predictionModelNames[1:12],  regionalRiskTitles[1:12], allcasedata)
 plotAllRegionalRisks(abind(as.movementmatrix(west_africa_gravity[,c(8,14,19)]), along=3), predictionModelNames[13], regionalRiskTitles[13], allcasedata)
 
@@ -130,3 +121,18 @@ aucmat2 <- calculateAUCMatrix(abind(as.movementmatrix(west_africa_gravity[,c(8,1
 aucmatrix <- cbind(aucmat1, aucmat2[,2])
 colnames(aucmatrix) <- c("Week index", predictionModelNames)
 
+write.csv(aucmatrix, "regional_results/aucdata.csv")
+
+print("Plotting weighted regional results")
+source("regional_results/plotWeightedMap.R")
+
+weighted_riskdata <- calculateWeightedRisks(riskData, aucmatrix, predictionModelNames[1:12])
+plotRegionalRisks(districts, countries, country_borders, weighted_riskdata, riskData[[1]]$reportedCases, "Regional relative risk of Ebola importation\n using weighted prediction model data", "regional_prediction_weighted")
+
+print("Plotting global risk map")
+source("global_results/plotMap.R")
+print("Plotting regional case history maps")
+source("regional_case_history/createRegionalCaseHistoryPlots.R")
+print("Plotting regional prediction history maps")
+source("regional_prediction_history/createRegionalPredictionHistory.R")
+print("Done")
