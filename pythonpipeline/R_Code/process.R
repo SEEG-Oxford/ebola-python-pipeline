@@ -12,6 +12,7 @@ print("Loading helper functions")
 source('process_movement_data.R')
 source('plotFunctions.R')
 source('palettes.R')
+source('diseaseMapping.R')
 
 # load shapefiles
 print("Loading Shapefiles")
@@ -109,7 +110,6 @@ movementMatrices <- foreach(idx=3:14, .combine = function(...) abind(..., along=
 stopCluster(cl)
 
 print("Plotting regional results")
-source("regional_results/plotMap.R")
 riskData <- plotAllRegionalRisks(movementMatrices, predictionModelNames[1:12],  regionalRiskTitles[1:12], allcasedata)
 plotAllRegionalRisks(abind(as.movementmatrix(west_africa_gravity[,c(8,14,19)]), along=3), predictionModelNames[13], regionalRiskTitles[13], allcasedata)
 
@@ -121,11 +121,9 @@ aucmat2 <- calculateAUCMatrix(abind(as.movementmatrix(west_africa_gravity[,c(8,1
 aucmatrix <- cbind(aucmat1, aucmat2[,2])
 colnames(aucmatrix) <- c("Week index", predictionModelNames)
 
-write.csv(aucmatrix, "regional_results/aucdata.csv")
+write.csv(aucmatrix, "aucdata.csv")
 
 print("Plotting weighted regional results")
-source("regional_results/plotWeightedMap.R")
-
 weighted_riskdata <- calculateWeightedRisks(riskData, aucmatrix, predictionModelNames[1:12])
 plotRegionalRisks(districts, countries, country_borders, weighted_riskdata, riskData[[1]]$reportedCases, "Regional relative risk of Ebola importation\n using weighted prediction model data", "regional_prediction_weighted")
 
