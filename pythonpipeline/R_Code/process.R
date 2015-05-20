@@ -109,26 +109,33 @@ movementMatrices <- foreach(idx=3:14, .combine = function(...) abind(..., along=
 }
 stopCluster(cl)
 
+###############################################################################
+# Start actual plotting of results                                            #
+###############################################################################
+
 print("Plotting regional results")
 riskData <- plotAllRegionalRisks(movementMatrices, predictionModelNames[1:12],  regionalRiskTitles[1:12], allcasedata)
 plotAllRegionalRisks(abind(as.movementmatrix(west_africa_gravity[,c(8,14,19)]), along=3), predictionModelNames[13], regionalRiskTitles[13], allcasedata)
-
 plotCompositeLeaflet(districts, riskData)
 
+print("Plotting weighted regional results")
 aucmat1 <- calculateAUCMatrix(movementMatrices, predictionModelNames[1:12], allcasedata)
 aucmat2 <- calculateAUCMatrix(abind(as.movementmatrix(west_africa_gravity[,c(8,14,19)]), along=3), predictionModelNames[13], allcasedata)
-
 aucmatrix <- cbind(aucmat1, aucmat2[,2])
 colnames(aucmatrix) <- c("Week index", predictionModelNames)
-
-write.csv(aucmatrix, "aucdata.csv")
-
-print("Plotting weighted regional results")
+#write.csv(aucmatrix, "aucdata.csv")
 weighted_riskdata <- calculateWeightedRisks(riskData, aucmatrix, predictionModelNames[1:12])
 plotRegionalRisks(districts, countries, country_borders, weighted_riskdata, riskData[[1]]$reportedCases, "Regional relative risk of Ebola importation\n using weighted prediction model data", "regional_prediction_weighted")
 
 print("Plotting global risk map")
-source("global_results/plotMap.R")
+source("calculateGlobalRisks.R")
+globalRisks <- calculateGlobalRisks(read.csv('../data/all.csv'), allcasedata)
+countrycodes <- as.vector(globalRisks$country.1)
+plotGlobalRisks(data.frame(country=countrycodes, risk=globalRisks$importation_risk), informCountries, allCountries, "global_Overall_prediction", "Global relative risk of Ebola importation\n from overall model")
+plotGlobalRisks(data.frame(country=countrycodes, risk=globalRisks$adjacency_relative), informCountries, allCountries, "global_Adjacency_prediction", "Global relative risk of Ebola importation\n from Adjacency model")
+plotGlobalRisks(data.frame(country=countrycodes, risk=globalRisks$gravity_relative), informCountries, allCountries, "global_Gravity_prediction", "Global relative risk of Ebola importation\n from Gravity model")
+plotGlobalRisks(data.frame(country=countrycodes, risk=globalRisks$migration_relative), informCountries, allCountries, "global_Migration_prediction", "Global relative risk of Ebola importation\n from Migration model")
+
 print("Plotting regional case history maps")
 source("regional_case_history/createRegionalCaseHistoryPlots.R")
 print("Plotting regional prediction history maps")
