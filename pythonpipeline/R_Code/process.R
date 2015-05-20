@@ -94,8 +94,6 @@ movementMatrices <- foreach(idx=3:14, .combine = function(...) abind(..., along=
 	as.movementmatrix(all_cdr_europe[,c(1,2,idx)])
 }
 stopCluster(cl)
-# we can't do this (see above)
-#movementMatrices <- abind(movementMatrices, as.movementmatrix(west_africa_gravity[,c(8,14,19)]), along=3)
 
 print("Plotting regional results")
 source("regional_results/plotMap.R")
@@ -108,3 +106,14 @@ source("regional_case_history/createRegionalCaseHistoryPlots.R")
 print("Plotting regional prediction history maps")
 source("regional_prediction_history/createRegionalPredictionHistory.R")
 print("Done")
+riskData <- plotAllRegionalRisks(movementMatrices, predictionModelNames[1:12],  regionalRiskTitles[1:12], allcasedata)
+plotAllRegionalRisks(abind(as.movementmatrix(west_africa_gravity[,c(8,14,19)]), along=3), predictionModelNames[13], regionalRiskTitles[13], allcasedata)
+
+plotCompositeLeaflet(districts, riskData)
+
+aucmat1 <- calculateAUCMatrix(movementMatrices, predictionModelNames[1:12], allcasedata)
+aucmat2 <- calculateAUCMatrix(abind(as.movementmatrix(west_africa_gravity[,c(8,14,19)]), along=3), predictionModelNames[13], allcasedata)
+
+aucmatrix <- cbind(aucmat1, aucmat2[,2])
+colnames(aucmatrix) <- c("Week index", predictionModelNames)
+

@@ -24,10 +24,10 @@ as.movementmatrix <- function(dataframe) {
 }
 
 # pull out origin, destination and radiation with selection_france
-getData <- function(raw_movement_matrix, endWeek, name, auc=TRUE) {
+getData <- function(raw_movement_matrix, endWeek, name, allCaseData, auc=TRUE) {
 	startWeek <- endWeek-3
 	if (startWeek < 1) startWeek <- 0
-	casedata <- colSums(allcasedata[c(startWeek:(endWeek-1)),][,-1])
+	casedata <- colSums(allCaseData[c(startWeek:(endWeek-1)),][,-1])
 	
 	for(idx in 1:nrow(raw_movement_matrix)) {
 		nametofind <- gsub("\\s", ".", row.names(raw_movement_matrix)[idx])
@@ -53,7 +53,7 @@ getData <- function(raw_movement_matrix, endWeek, name, auc=TRUE) {
 	if(auc) {
 		# calculate AUC
 		# select the week being predicted
-		weekbeingpredicted <- allcasedata[endWeek,][,-1]
+		weekbeingpredicted <- allCaseData[endWeek,][,-1]
 		# make it logical (either there are cases or not)
 		weekbeingpredicted[weekbeingpredicted > 0] <- 1
 		
@@ -69,10 +69,10 @@ getData <- function(raw_movement_matrix, endWeek, name, auc=TRUE) {
 	return (list(reportedCases=reportedCases, predictedRegions=predictedRegions, AUC=AUC, name=name))
 }
 
-getSimpleData <- function(endWeek) {
+getSimpleData <- function(endWeek, allCaseData) {
 	startWeek <- endWeek-2
 	if(startWeek < 0) startWeek <- 0
-	casedata <- colSums(allcasedata[c(startWeek:endWeek),][,-1])
+	casedata <- colSums(allCaseData[c(startWeek:endWeek),][,-1])
 	
 	# these are the "core" districts
 	reportedCases <- casedata[casedata > 0]
