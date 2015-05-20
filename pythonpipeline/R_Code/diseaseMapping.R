@@ -63,3 +63,18 @@ calculateWeightedRisks <- function(riskData, aucs, predictionModelNames, outfile
 	}
 	return(weighted_riskdata)
 }
+
+createRegionalCaseHistoryMaps <- function(allCaseData, districts, countries, country_borders) {
+	cl <- makeCluster(8, outfile="out.log")
+	registerDoParallel(cl)
+
+	foreach(idx=1:mostRecent,.packages=c("aqfig"),.export=c("getSimpleData")) %dopar% {
+		# plot
+		rawdate <- paste(gsub("-W", " ", as.character(allCaseData[idx,1])), "1", sep=" ")
+		formattedDate <- format(as.POSIXct(rawdate, format="%Y %U %u"), format="%B %d %Y")
+		source('plotFunctions.R')
+		plotDate(formattedDate, filename=paste(formatC(idx, width=2, flag="0"), "date", sep="_"))
+		plotHistoricCases(districts, countries, country_borders, 0, getSimpleData(idx, allCaseData), plotTitle="", filename=paste(formatC(idx, width=2, flag="0"), "regional_cases_week", sep="_"), max(log(allCaseData[,-1])))
+	}
+	stopCluster(cl)
+}

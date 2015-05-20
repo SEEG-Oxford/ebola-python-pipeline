@@ -185,7 +185,7 @@ plotDate <- function(datestring, filename) {
 	par(mar = c(5, 4, 4, 2) + 0.1)
 }
 
-plotHistoricCases <- function(districts, countries, country_borders, predictedRegions, reportedCases, plotTitle, filename) {
+plotHistoricCases <- function(districts, countries, country_borders, predictedRegions, reportedCases, plotTitle, filename, upperLimit) {
 	vals <- rep(NA, nrow(districts))
 	for(idx in 1:length(predictedRegions)) {	
 		vals[match(names(predictedRegions[idx]), paste(districts$COUNTRY_ID,districts$NAME, sep='_'))] <- predictedRegions[idx]
@@ -195,7 +195,7 @@ plotHistoricCases <- function(districts, countries, country_borders, predictedRe
 			districts,
 			countries,
 			country_borders,
-			zlim = c(0, max(log(allcasedata[,-1]))),
+			zlim = c(0, upperLimit),
 			ramp = colorRampPalette(c("#fcbba1","#fc9272","#fb6a4a","#ef3b2c","#cb181d","#a50f15","#67000d")),#seqRamp('Reds'), #c("#fff5f0","#fee0d2","#fcbba1","#fc9272","#fb6a4a","#ef3b2c","#cb181d","#a50f15","#67000d")
 			reportedCases = reportedCases,
 			plotTitle = plotTitle)

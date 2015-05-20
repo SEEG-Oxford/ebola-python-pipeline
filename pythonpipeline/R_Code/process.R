@@ -137,7 +137,7 @@ plotGlobalRisks(data.frame(country=countrycodes, risk=globalRisks$gravity_relati
 plotGlobalRisks(data.frame(country=countrycodes, risk=globalRisks$migration_relative), informCountries, allCountries, "global_Migration_prediction", "Global relative risk of Ebola importation\n from Migration model")
 
 print("Plotting regional case history maps")
-source("regional_case_history/createRegionalCaseHistoryPlots.R")
+createRegionalCaseHistoryMaps(allcasedata, districts, countries, country_borders)
 print("Plotting regional prediction history maps")
 source("regional_prediction_history/createRegionalPredictionHistory.R")
 print("Done")
