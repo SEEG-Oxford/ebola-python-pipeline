@@ -9,7 +9,6 @@ require(abind)
 
 # load required helper functions
 print("Loading helper functions")
-source('process_movement_data.R')
 source('plotFunctions.R')
 source('palettes.R')
 source('diseaseMapping.R')
@@ -114,8 +113,10 @@ stopCluster(cl)
 ###############################################################################
 
 print("Plotting regional results")
-riskData <- plotAllRegionalRisks(movementMatrices, predictionModelNames[1:12],  regionalRiskTitles[1:12], allcasedata)
-plotAllRegionalRisks(abind(as.movementmatrix(west_africa_gravity[,c(8,14,19)]), along=3), predictionModelNames[13], regionalRiskTitles[13], allcasedata)
+riskData <- getRiskData(movementMatrices, predictionModelNames[1:12], allcasedata, mostRecent)
+plotAllRegionalRisks(riskData, districts, countries, country_borders, regionalRiskTitles)
+africaRiskData <- getRiskData(abind(as.movementmatrix(west_africa_gravity[,c(8,14,19)]), along=3), predictionModelNames[13], allcasedata, mostRecent)
+plotAllRegionalRisks(africaRiskData, districts, countries, country_borders, regionalRiskTitles[13])
 plotCompositeLeaflet(districts, riskData)
 
 print("Plotting weighted regional results")
@@ -124,10 +125,11 @@ aucmat2 <- calculateAUCMatrix(abind(as.movementmatrix(west_africa_gravity[,c(8,1
 aucmatrix <- cbind(aucmat1, aucmat2[,2])
 colnames(aucmatrix) <- c("Week index", predictionModelNames)
 #write.csv(aucmatrix, "aucdata.csv")
-weighted_riskdata <- calculateWeightedRisks(riskData, aucmatrix, predictionModelNames[1:12])
+weighted_riskdata <- calculateWeightedRisks(riskData, tail(aucmatrix,3), predictionModelNames[1:12])
 plotRegionalRisks(districts, countries, country_borders, weighted_riskdata, riskData[[1]]$reportedCases, "Regional relative risk of Ebola importation\n using weighted prediction model data", "regional_prediction_weighted")
 
 print("Plotting global risk map")
+# this calculation is currently ebola specific
 source("calculateGlobalRisks.R")
 globalRisks <- calculateGlobalRisks(read.csv('../data/all.csv'), allcasedata)
 countrycodes <- as.vector(globalRisks$country.1)
@@ -138,6 +140,9 @@ plotGlobalRisks(data.frame(country=countrycodes, risk=globalRisks$migration_rela
 
 print("Plotting regional case history maps")
 createRegionalCaseHistoryMaps(allcasedata, districts, countries, country_borders)
+
 print("Plotting regional prediction history maps")
 source("regional_prediction_history/createRegionalPredictionHistory.R")
+createRegionalPredictionHistoryMaps(mostRecent, movementMatrices, predictionModelNames[1:12], allcasedata, districts, countries, country_borders, aucmatrix)
+
 print("Done")
