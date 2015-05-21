@@ -1,11 +1,11 @@
-getRiskData <- function(movementMatrices, predictionModelNames, allCaseData, mostRecent) {
+getRiskData <- function(movementMatrices, predictionModelNames, caseData, sampleOfInterest) {
 	# work out how many risk models we have to deal with
 	riskModelCount <- dim(movementMatrices)[3]
 
 	riskData <- rep(NULL, riskModelCount)
 
 	for (i in 1:riskModelCount) {
-		riskData[[i]] <- getData(movementMatrices[,,i], mostRecent, predictionModelNames[i], allCaseData, auc=FALSE)
+		riskData[[i]] <- getData(movementMatrices[,,i], sampleOfInterest, predictionModelNames[i], caseData, auc=FALSE)
 	}
 	
 	return(riskData)
@@ -18,19 +18,19 @@ plotAllRegionalRisks <- function(riskData, districts, countries, country_borders
 	}
 }
 
-calculateAUCMatrix <- function(movementMatrices, predictionModelNames, allCaseData) {
+calculateAUCMatrix <- function(movementMatrices, predictionModelNames, caseData, sampleOfInterest) {
 	# work out how many risk models we have to deal with
 	riskModelCount <- dim(movementMatrices)[3]
 	
 	cl <- makeCluster(8)
 	registerDoParallel(cl)
 
-	aucmatrix <- foreach(idx=1:mostRecent,.combine="rbind", .export=c("getData", "calcAUC", "desc_integrate")) %dopar% {
+	aucmatrix <- foreach(idx=1:sampleOfInterest,.combine="rbind", .export=c("getData", "calcAUC", "desc_integrate")) %dopar% {
 		# we sometimes(?) need to manually track the indices if using a parallel library
 		aucresult <- numeric()
 		aucresult[1] <- idx
 		for (i in 1:riskModelCount) {
-			riskdata1 <- getData(movementMatrices[,,i], idx, predictionModelNames[i], allCaseData)
+			riskdata1 <- getData(movementMatrices[,,i], idx, predictionModelNames[i], caseData)
 			aucresult[i+1] <- riskdata1$AUC
 		}
 		
@@ -38,14 +38,14 @@ calculateAUCMatrix <- function(movementMatrices, predictionModelNames, allCaseDa
 	}
 	stopCluster(cl)
 
+	# convert the results back into a numeric matrix rather than a matrix of lists
 	aucmatrix <- matrix(as.numeric(unlist(aucmatrix)),nrow=nrow(aucmatrix))
 	return(aucmatrix)
 }
 
-calculateWeightedRisks <- function(riskData, aucs, predictionModelNames, outfile=TRUE) {
+calculateWeightedRisks <- function(riskData, aucs, outfile=TRUE) {
 	# get the average ignore NaNs, nulls etc
-	avgauc <- colMeans(aucs[,c(-1:-2)], na.rm = TRUE)
-	names(avgauc) <- predictionModelNames[1:12]
+	avgauc <- colMeans(aucs[,c(-1)], na.rm = TRUE)
 	
 	aucCount <- length(avgauc)
 	cl <- makeCluster(8)
@@ -62,35 +62,34 @@ calculateWeightedRisks <- function(riskData, aucs, predictionModelNames, outfile
 		weighted_riskdata <- weighted_riskdata / max(weighted_riskdata)
 	}
 	if(outfile) {
-		write.csv((avgauc[1:12] / max(avgauc[1:12])) /sum(avgauc[1:12]), "weightings.csv")
+		write.csv((avgauc / max(avgauc)) /sum(avgauc), "weightings.csv")
 	}
 	return(weighted_riskdata)
 }
 
-createRegionalCaseHistoryMaps <- function(allCaseData, districts, countries, country_borders) {
+createRegionalCaseHistoryMaps <- function(caseData, districts, countries, country_borders, finalSample) {
 	cl <- makeCluster(8, outfile="out.log")
 	registerDoParallel(cl)
 
-	foreach(idx=1:mostRecent,.packages=c("aqfig"),.export=c("getSimpleData")) %dopar% {
-		# plot
-		rawdate <- paste(gsub("-W", " ", as.character(allCaseData[idx,1])), "1", sep=" ")
+	foreach(idx=1:finalSample,.packages=c("aqfig"),.export=c("getSimpleData")) %dopar% {
+		rawdate <- paste(gsub("-W", " ", as.character(caseData[idx,1])), "1", sep=" ")
 		formattedDate <- format(as.POSIXct(rawdate, format="%Y %U %u"), format="%B %d %Y")
 		source('plotFunctions.R')
 		plotDate(formattedDate, filename=paste(formatC(idx, width=2, flag="0"), "date", sep="_"))
-		plotHistoricCases(districts, countries, country_borders, 0, getSimpleData(idx, allCaseData), plotTitle="", filename=paste(formatC(idx, width=2, flag="0"), "regional_cases_week", sep="_"), max(log(allCaseData[,-1])))
+		plotHistoricCases(districts, countries, country_borders, 0, getSimpleData(idx, caseData), plotTitle="", filename=paste(formatC(idx, width=2, flag="0"), "regional_cases_week", sep="_"), max(log(caseData[,-1])))
 	}
 	stopCluster(cl)
 }
 
-createRegionalPredictionHistoryMaps <- function(mostRecent, movementMatrices, predictionModelNames, allcasedata, districts, countries, country_borders, aucmatrix) {
+createRegionalPredictionHistoryMaps <- function(finalSample, movementMatrices, predictionModelNames, caseData, districts, countries, country_borders, aucmatrix) {
 	cl <- makeCluster(8, outfile="out.log")
 	registerDoParallel(cl)
 
-	foreach(idx=4:mostRecent, .packages=c("aqfig", "raster", "doParallel", "foreach"), .export=c("getData", "plotRisks", "plotMap")) %dopar% {
+	foreach(idx=4:finalSample, .packages=c("aqfig", "raster", "doParallel", "foreach"), .export=c("getData", "plotRisks", "plotMap")) %dopar% {
 		source('palettes.R')
 		source('diseaseMapping.R')
-		riskData <- getRiskData(movementMatrices, predictionModelNames, allcasedata, idx)
-		weighted_riskdata <- calculateWeightedRisks(riskData, aucmatrix[(idx-3):(idx-1),], predictionModelNames)
+		riskData <- getRiskData(movementMatrices, predictionModelNames, caseData, idx)
+		weighted_riskdata <- calculateWeightedRisks(riskData, aucmatrix[(idx-3):(idx-1),], FALSE)
 
 		# plot
 		plotRisks(districts, countries, country_borders, weighted_riskdata, riskData[1][[1]]$reportedCases, plotTitle="", filename=paste(formatC(idx, width=2, flag="0"), "regional_prediction_weighted", sep="_"))
@@ -122,11 +121,11 @@ as.movementmatrix <- function(dataframe) {
 }
 
 # pull out origin, destination and radiation with selection_france
-getData <- function(raw_movement_matrix, endWeek, name, allCaseData, auc=TRUE) {
+getData <- function(raw_movement_matrix, sampleOfInterest, name, allCaseData, auc=TRUE) {
 	AUC=NULL
-	startWeek <- endWeek-3
+	startWeek <- sampleOfInterest-3
 	if (startWeek < 1) startWeek <- 0
-	casedata <- colSums(allCaseData[c(startWeek:(endWeek-1)),][,-1])
+	casedata <- colSums(allCaseData[c(startWeek:(sampleOfInterest-1)),][,-1])
 	
 	for(idx in 1:nrow(raw_movement_matrix)) {
 		nametofind <- gsub("\\s", ".", row.names(raw_movement_matrix)[idx])
@@ -152,7 +151,7 @@ getData <- function(raw_movement_matrix, endWeek, name, allCaseData, auc=TRUE) {
 	if(auc) {
 		# calculate AUC
 		# select the week being predicted
-		weekbeingpredicted <- allCaseData[endWeek,][,-1]
+		weekbeingpredicted <- allCaseData[sampleOfInterest,][,-1]
 		# make it logical (either there are cases or not)
 		weekbeingpredicted[weekbeingpredicted > 0] <- 1
 		
@@ -168,10 +167,10 @@ getData <- function(raw_movement_matrix, endWeek, name, allCaseData, auc=TRUE) {
 	return (list(reportedCases=reportedCases, predictedRegions=predictedRegions, AUC=AUC, name=name))
 }
 
-getSimpleData <- function(endWeek, allCaseData) {
-	startWeek <- endWeek-2
+getSimpleData <- function(sampleOfInterest, allCaseData) {
+	startWeek <- sampleOfInterest-2
 	if(startWeek < 0) startWeek <- 0
-	casedata <- colSums(allCaseData[c(startWeek:endWeek),][,-1])
+	casedata <- colSums(allCaseData[c(startWeek:sampleOfInterest),][,-1])
 	
 	# these are the "core" districts
 	reportedCases <- casedata[casedata > 0]

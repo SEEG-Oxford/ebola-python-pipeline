@@ -120,12 +120,13 @@ plotAllRegionalRisks(africaRiskData, districts, countries, country_borders, regi
 plotCompositeLeaflet(districts, riskData)
 
 print("Plotting weighted regional results")
-aucmat1 <- calculateAUCMatrix(movementMatrices, predictionModelNames[1:12], allcasedata)
-aucmat2 <- calculateAUCMatrix(abind(as.movementmatrix(west_africa_gravity[,c(8,14,19)]), along=3), predictionModelNames[13], allcasedata)
-aucmatrix <- cbind(aucmat1, aucmat2[,2])
-colnames(aucmatrix) <- c("Week index", predictionModelNames)
+aucmatrix <- calculateAUCMatrix(movementMatrices, predictionModelNames[1:12], allcasedata, mostRecent)
+# at this point we don't want to include the west_africa_gravity model in the rest of the calculations
+#aucmat2 <- calculateAUCMatrix(abind(as.movementmatrix(west_africa_gravity[,c(8,14,19)]), along=3), predictionModelNames[13], allcasedata, mostRecent)
+#aucmatrix <- cbind(aucmat1, aucmat2[,2])
+colnames(aucmatrix) <- c("Week index", predictionModelNames[1:12])
 #write.csv(aucmatrix, "aucdata.csv")
-weighted_riskdata <- calculateWeightedRisks(riskData, tail(aucmatrix,3), predictionModelNames[1:12])
+weighted_riskdata <- calculateWeightedRisks(riskData, tail(aucmatrix,3))
 plotRegionalRisks(districts, countries, country_borders, weighted_riskdata, riskData[[1]]$reportedCases, "Regional relative risk of Ebola importation\n using weighted prediction model data", "regional_prediction_weighted")
 
 print("Plotting global risk map")
@@ -139,7 +140,7 @@ plotGlobalRisks(data.frame(country=countrycodes, risk=globalRisks$gravity_relati
 plotGlobalRisks(data.frame(country=countrycodes, risk=globalRisks$migration_relative), informCountries, allCountries, "global_Migration_prediction", "Global relative risk of Ebola importation\n from Migration model")
 
 print("Plotting regional case history maps")
-createRegionalCaseHistoryMaps(allcasedata, districts, countries, country_borders)
+createRegionalCaseHistoryMaps(allcasedata, districts, countries, country_borders, mostRecent)
 
 print("Plotting regional prediction history maps")
 createRegionalPredictionHistoryMaps(mostRecent, movementMatrices, predictionModelNames[1:12], allcasedata, districts, countries, country_borders, aucmatrix)
