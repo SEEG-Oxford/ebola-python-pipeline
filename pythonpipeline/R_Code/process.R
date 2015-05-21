@@ -142,7 +142,6 @@ print("Plotting regional case history maps")
 createRegionalCaseHistoryMaps(allcasedata, districts, countries, country_borders)
 
 print("Plotting regional prediction history maps")
-source("regional_prediction_history/createRegionalPredictionHistory.R")
 createRegionalPredictionHistoryMaps(mostRecent, movementMatrices, predictionModelNames[1:12], allcasedata, districts, countries, country_borders, aucmatrix)
 
 print("Done")

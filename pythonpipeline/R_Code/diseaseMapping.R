@@ -82,6 +82,22 @@ createRegionalCaseHistoryMaps <- function(allCaseData, districts, countries, cou
 	stopCluster(cl)
 }
 
+createRegionalPredictionHistoryMaps <- function(mostRecent, movementMatrices, predictionModelNames, allcasedata, districts, countries, country_borders, aucmatrix) {
+	cl <- makeCluster(8, outfile="out.log")
+	registerDoParallel(cl)
+
+	foreach(idx=4:mostRecent, .packages=c("aqfig", "raster", "doParallel", "foreach"), .export=c("getData", "plotRisks", "plotMap")) %dopar% {
+		source('palettes.R')
+		source('diseaseMapping.R')
+		riskData <- getRiskData(movementMatrices, predictionModelNames, allcasedata, idx)
+		weighted_riskdata <- calculateWeightedRisks(riskData, aucmatrix[(idx-3):(idx-1),], predictionModelNames)
+
+		# plot
+		plotRisks(districts, countries, country_borders, weighted_riskdata, riskData[1][[1]]$reportedCases, plotTitle="", filename=paste(formatC(idx, width=2, flag="0"), "regional_prediction_weighted", sep="_"))
+	}
+	stopCluster(cl)
+}
+
 # helper function
 as.movementmatrix <- function(dataframe) {
 	nrows <- length(unique(dataframe[1])[,])
