@@ -85,7 +85,7 @@ createRegionalPredictionHistoryMaps <- function(finalSample, movementMatrices, p
 	cl <- makeCluster(8, outfile="out.log")
 	registerDoParallel(cl)
 
-	foreach(idx=4:finalSample, .packages=c("aqfig", "raster", "doParallel", "foreach", "RColorBrewer"), .export=c("getData", "plotRisks", "plotMap", "seqRamp", "getColors", "legendColors")) %dopar% {
+	foreach(idx=4:finalSample, .packages=c("aqfig", "raster", "doParallel", "foreach", "RColorBrewer"), .export=c("getData", "plotRisks", "plotMap", "seqRamp", "getColors")) %dopar% {
 		source('diseaseMapping.R')
 		riskData <- getRiskData(movementMatrices, predictionModelNames, caseData, idx)
 		weighted_riskdata <- calculateWeightedRisks(riskData, aucmatrix[(idx-3):(idx-1),], FALSE)

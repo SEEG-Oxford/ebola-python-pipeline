@@ -126,7 +126,7 @@ aucmatrix <- calculateAUCMatrix(movementMatrices, predictionModelNames[1:12], al
 colnames(aucmatrix) <- c("Week index", predictionModelNames[1:12])
 #write.csv(aucmatrix, "aucdata.csv")
 weighted_riskdata <- calculateWeightedRisks(riskData, tail(aucmatrix,3))
-plotRegionalRisks(districts, countries, country_borders, weighted_riskdata, riskData[[1]]$reportedCases, "Regional relative risk of Ebola importation\n using weighted prediction model data", "regional_prediction_weighted")
+plotRegionalRisks(districts, countries, country_borders, weighted_riskdata, riskData[[1]]$reportedCases, "Regional relative risk of Ebola importation\n using weighted prediction model data", "regional_prediction_weighted", leaflet=TRUE)
 
 print("Plotting global risk map")
 # this calculation is currently ebola specific

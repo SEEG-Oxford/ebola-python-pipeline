@@ -12,13 +12,13 @@ getColors <- function(a, b, samples, vals, ramp) {
 
 plotLeafletMap <- function(vals, districts, dirName, regionColours) {
 	districts$risk <- vals
-	q.dat <- toGeoJSON(data=districts, dest=dir_name, name="districts")
+	q.dat <- toGeoJSON(data=districts, dest=dirName, name="districts")
 	q.style <- styleCat(prop="ID", val=seq(0,248), style.val=regionColours, lwd=1, leg="a")
-	q.map <- leaflet(data=q.dat, dest=dir_name, title="Regional Risk", base.map=list("positron", "darkmatter", "mqsat", "tls", "osm"), style=q.style, popup="*", controls=list("zoom", "scale", "layer"))
+	q.map <- leaflet(data=q.dat, dest=dirName, title="Regional Risk", base.map=list("positron", "darkmatter", "mqsat", "tls", "osm"), style=q.style, popup="*", controls=list("zoom", "scale", "layer"))
 	q.map
 }
 
-plotRegionalRisks <- function(districts, countries, country_borders, predictedRegions, reportedCases, plotTitle, filename, leaflet=TRUE) {
+plotRegionalRisks <- function(districts, countries, country_borders, predictedRegions, reportedCases, plotTitle, filename, leaflet=FALSE) {
 	vals <- rep(NA, nrow(districts))
 	for(idx in 1:length(predictedRegions)) {	
 		vals[match(names(predictedRegions[idx]), paste(districts$COUNTRY_ID,districts$NAME, sep='_'))] <- predictedRegions[idx]
@@ -30,15 +30,19 @@ plotRegionalRisks <- function(districts, countries, country_borders, predictedRe
 	
 	newfilename <- paste(filename, ".png", sep="")
 	png(filename=newfilename, width=800, height=700, units='px', pointsize=20)
-	plotMap(districts,
-			countries,
-			country_borders,
-			plotTitle,
-			regionColours,
-			legendColors,
-			legendRange)
+	if(leaflet) {
+		plotMap(districts,
+				countries,
+				country_borders,
+				plotTitle,
+				regionColours,
+				legendColors,
+				legendRange)
+	}
 	dev.off()
-	plotLeafletMap(vals, districts, dirname(newfilename), regionColours)
+	if(leaflet) {
+		plotLeafletMap(vals, districts, dirname(newfilename), regionColours)
+	}
 	png(filename=paste(filename, "large.png", sep="_"), width=8000, height=7000, units='px', pointsize=100)
 	plotMap(districts,
 			countries,
