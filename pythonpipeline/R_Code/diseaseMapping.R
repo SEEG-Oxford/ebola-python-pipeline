@@ -18,7 +18,7 @@ plotAllRegionalRisks <- function(riskData, districts, countries, country_borders
 	}
 }
 
-calculateAUCMatrix <- function(movementMatrices, predictionModelNames, caseData, sampleOfInterest) {
+calculateAUCMatrix <- function(movementMatrices, predictionModelNames, caseData, sampleOfInterest, coreRegex) {
 	# work out how many risk models we have to deal with
 	riskModelCount <- dim(movementMatrices)[3]
 	
@@ -30,7 +30,7 @@ calculateAUCMatrix <- function(movementMatrices, predictionModelNames, caseData,
 		aucresult <- numeric()
 		aucresult[1] <- idx
 		for (i in 1:riskModelCount) {
-			riskdata1 <- getData(movementMatrices[,,i], idx, predictionModelNames[i], caseData)
+			riskdata1 <- getData(movementMatrices[,,i], idx, predictionModelNames[i], caseData, coreRegex=coreRegex)
 			aucresult[i+1] <- riskdata1$AUC
 		}
 		
@@ -120,7 +120,7 @@ as.movementmatrix <- function(dataframe) {
 }
 
 # pull out origin, destination and radiation with selection_france
-getData <- function(raw_movement_matrix, sampleOfInterest, name, allCaseData, auc=TRUE) {
+getData <- function(raw_movement_matrix, sampleOfInterest, name, allCaseData, auc=TRUE, coreRegex=NULL) {
 	AUC=NULL
 	startWeek <- sampleOfInterest-3
 	if (startWeek < 1) startWeek <- 0
@@ -153,7 +153,7 @@ getData <- function(raw_movement_matrix, sampleOfInterest, name, allCaseData, au
 		# remove regions where the are already cases to prevent skewing the data
 		weekbeingpredicted <- weekbeingpredicted[!(names(weekbeingpredicted) %in% names(reportedCases))]
 		
-		predictions <- summedRegions[grep("GIN|LBR|SLE", names(summedRegions))]
+		predictions <- summedRegions[grep(coreRegex, names(summedRegions))]
 		predictions <- predictions[!(names(predictions) %in% names(reportedCases))]
 		
 		AUC <- calcAUC(data.frame(weekbeingpredicted), data.frame(predictions),plot=FALSE,error_bars=FALSE,ci=0.95,res=100,main=name)

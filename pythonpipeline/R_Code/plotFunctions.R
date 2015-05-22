@@ -88,24 +88,24 @@ plotGlobalMap <- function (vals,
                      n = 1000,
 					 maptitle,
 					 dir_name=NA,
-					 filename) {
+					 filename,
+					 coreRegex) {
   # get the colours
   countryColors <- getColors(zlim[1], zlim[2], n, vals, ramp)
   # special cases for LBR, SLE and GIN
-  countryColors[grep("LBR|GIN|SLE", countries$admin0_COU)] <- "#33D3FF"
+  countryColors[grep(coreRegex, countries$admin0_COU)] <- "#33D3FF"
   countryColors[is.na(countryColors)] <- grey(0.9)
   
   par(mar=c(1,1,2,2))
   plot(all_countries[-9,], col = grey(0.9))
   plot(countries, col = countryColors, border = 'black', lwd = 1,add=TRUE)
-  vertical.image.legend(col=seqRamp('YlOrRd')(1000),zlim=c(0,1))
+  vertical.image.legend(col=ramp(1000),zlim=c(0,1))
   title(main=maptitle)
   
   if(!is.na(dir_name)) {
 	  countryData <- countries@data
 	  countries <- gSimplify(countries, tol=0.05, topologyPreserve=TRUE)
 	  countries <- SpatialPolygonsDataFrame(countries, countryData, match.ID=FALSE)
-	  #countries$risk <- vals
 	  q.dat <- toGeoJSON(data=countries, dest=dir_name, name="countries")
 	  q.style <- styleCat(prop="ID", val=seq(0,190), style.val=countryColors, lwd=1, leg="a")
 	  q.map <- leaflet(data=q.dat, dest=dir_name, title=filename, base.map=list("positron", "darkmatter", "mqsat", "tls", "osm"), style=q.style, popup="*", controls=list("zoom", "scale", "layer"))
@@ -114,16 +114,14 @@ plotGlobalMap <- function (vals,
   
 }
 
-plotGlobalRisks <- function(risks, countries, all_countries, filename, maptitle) {
-	nonCoreRisks <- risks[risks$country != "LBR" & risks$country != "GIN" & risks$country != "SLE",]
-
+plotGlobalRisks <- function(risks, countries, all_countries, filename, maptitle, allCountryNames, ramp, coreRegex) {
 	# scale the risks between 0 and 1
-	nonCoreRisks$risk = as.numeric(as.vector(nonCoreRisks$risk)) / max(as.numeric(as.vector(nonCoreRisks$risk)))
+	risks$risk = as.numeric(as.vector(risks$risk)) / max(as.numeric(as.vector(risks$risk)))
 
-	vals <- rep(NA, length(countries$admin0_COU))
+	vals <- rep(NA, length(allCountryNames))
 
-	for(idx in 1:nrow(nonCoreRisks)) {
-		vals[match(as.character(nonCoreRisks[idx,1]), countries$admin0_COU)] <- as.numeric(as.vector(nonCoreRisks[idx,2]))
+	for(idx in 1:nrow(risks)) {
+		vals[match(as.character(risks[idx,1]), allCountryNames)] <- as.numeric(as.vector(risks[idx,2]))
 	}
 
 	newfilename <- paste(filename, "large.png", sep="_")
@@ -132,10 +130,11 @@ plotGlobalRisks <- function(risks, countries, all_countries, filename, maptitle)
 			countries,
 			all_countries,
 			zlim = c(0, 1),
-			ramp = seqRamp('YlOrRd'),
+			ramp = ramp,
 			maptitle=maptitle,
 			dir_name = dirname(newfilename),
-			filename = filename
+			filename = filename,
+			coreRegex = coreRegex
 			)
 	dev.off()
 	png(filename=paste(filename, ".png", sep=""), width=800, height=400, units='px', pointsize=20)
@@ -143,9 +142,10 @@ plotGlobalRisks <- function(risks, countries, all_countries, filename, maptitle)
 			countries,
 			all_countries,
 			zlim = c(0, 1),
-			ramp = seqRamp('YlOrRd'),
+			ramp = ramp,
 			maptitle=maptitle,
-			filename = filename)
+			filename = filename,
+			coreRegex = coreRegex)
 	dev.off()
 }
 
