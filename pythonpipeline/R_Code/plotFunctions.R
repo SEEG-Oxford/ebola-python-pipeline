@@ -188,66 +188,37 @@ plotHistoricCases <- function(districts, countries, country_borders, predictedRe
 	for(idx in 1:length(predictedRegions)) {	
 		vals[match(names(predictedRegions[idx]), paste(districts$COUNTRY_ID,districts$NAME, sep='_'))] <- predictedRegions[idx]
 	}
+	
+	redPalette <- colorRampPalette(c("#fcbba1","#fc9272","#fb6a4a","#ef3b2c","#cb181d","#a50f15","#67000d"))
+	
+	regionColours <- getColors(0, upperLimit, 1000, vals, redPalette)  
+	regionColours[paste(districts$COUNTRY_ID,districts$NAME, sep='_') %in% names(reportedCases)] <- grey(0.7)
+	legendColors <- redPalette(1000)
+	legendRange <- c(0,upperLimit)
+	
 	png(filename=paste(filename, ".png", sep=""), width=800, height=700, units='px', pointsize=20)
-	plotHistoricCaseMap(vals,
-			districts,
+	plotMap(districts,
 			countries,
 			country_borders,
-			zlim = c(0, upperLimit),
-			ramp = colorRampPalette(c("#fcbba1","#fc9272","#fb6a4a","#ef3b2c","#cb181d","#a50f15","#67000d")),#seqRamp('Reds'), #c("#fff5f0","#fee0d2","#fcbba1","#fc9272","#fb6a4a","#ef3b2c","#cb181d","#a50f15","#67000d")
-			reportedCases = reportedCases,
-			plotTitle = plotTitle)
+			plotTitle,
+			regionColours,
+			legendColors,
+			legendRange)
 	dev.off()
 }
 
-plotHistoricCaseMap <- function (vals,
-                     districts,
+plotMap <- function (districts,
                      countries,
                      country_borders,
-                     zlim = range(vals),
-                     ramp = seqRamp(),
-                     n = 1000,
-					 reportedCases,
-					 plotTitle) {
-# get the colours
-  regionColours <- getColors(zlim[1], zlim[2], n, vals, ramp)
-
-  newbins <- cut(log(reportedCases), col_range, include.lowest = TRUE)
-  newcols <- cols[newbins]
-  
-  regionColours[paste(districts$COUNTRY_ID,districts$NAME, sep='_') %in% names(reportedCases)] <- newcols
-  
-  par(mar=c(1,1,2,2))
-  plot(countries, col = gray(0.9), border = 'white', lwd = 3)
-  plot(districts, col = regionColours, border = 'white', add = TRUE)
-  plot(country_borders, col = grey(0.4), add = TRUE)
-  vertical.image.legend(col=ramp(n),zlim=c(0,1))
-  title(main=plotTitle)  
-}
-
-plotMap <- function (vals,
-                     districts,
-                     countries,
-                     country_borders,
-                     zlim = range(vals),
-                     ramp = seqRamp(),
-                     n = 1000,
-					 reportedCases,
-					 plotTitle) {
-  # given some values vals (one for each district) a corresponding 
-  # district-level shapefile, a colorRampPalette and
-  # optional range of the colours, plot a map of the values with a nice legend.
-  
-  # get the colours
-  regionColours <- getColors(zlim[1], zlim[2], n, vals, ramp)
-  
-  regionColours[paste(districts$COUNTRY_ID,districts$NAME, sep='_') %in% names(reportedCases)] <- grey(0.7)
-  
+					 plotTitle,
+					 objectColors,
+					 legendColors,
+					 legendRange) {
   par(mar=c(1,1,2,2))
   plot(countries, col = grey(0.9), border = 'white', lwd = 3)
-  plot(districts, col = regionColours, border = 'white', add = TRUE)
+  plot(districts, col = objectColors, border = 'white', add = TRUE)
   plot(country_borders, col = grey(0.4), add = TRUE)
-  vertical.image.legend(col=seqRamp('YlOrRd')(1000),zlim=c(0,1))
+  vertical.image.legend(col=legendColors,zlim=legendRange)
   title(main=plotTitle)  
 }
 
@@ -256,15 +227,20 @@ plotRisks <- function(districts, countries, country_borders, predictedRegions, r
 	for(idx in 1:length(predictedRegions)) {	
 		vals[match(names(predictedRegions[idx]), paste(districts$COUNTRY_ID,districts$NAME, sep='_'))] <- predictedRegions[idx]
 	}
+	
+	regionColours <- getColors(0, 1, 1000, vals, seqRamp('YlOrRd'))  
+	regionColours[paste(districts$COUNTRY_ID,districts$NAME, sep='_') %in% names(reportedCases)] <- grey(0.7)
+	legendColors <- seqRamp('YlOrRd')(1000)
+	legendRange <- c(0,1)
+	
 	png(filename=paste(filename, ".png", sep=""), width=800, height=700, units='px', pointsize=20)
-	plotMap(vals,
-			districts,
+	plotMap(districts,
 			countries,
 			country_borders,
-			zlim = c(0, 1),
-			ramp = seqRamp('YlOrRd'),
-			reportedCases = reportedCases,
-			plotTitle = plotTitle)
+			plotTitle,
+			regionColours,
+			legendColors,
+			legendRange)
 	dev.off()
 }
 

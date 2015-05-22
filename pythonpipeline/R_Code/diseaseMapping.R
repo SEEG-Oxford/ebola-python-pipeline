@@ -71,7 +71,7 @@ createRegionalCaseHistoryMaps <- function(caseData, districts, countries, countr
 	cl <- makeCluster(8, outfile="out.log")
 	registerDoParallel(cl)
 
-	foreach(idx=1:finalSample,.packages=c("aqfig"),.export=c("getSimpleData")) %dopar% {
+	foreach(idx=1:finalSample,.packages=c("aqfig"),.export=c("getSimpleData", "plotRisks", "plotMap", "seqRamp", "getColors")) %dopar% {
 		rawdate <- paste(gsub("-W", " ", as.character(caseData[idx,1])), "1", sep=" ")
 		formattedDate <- format(as.POSIXct(rawdate, format="%Y %U %u"), format="%B %d %Y")
 		source('plotFunctions.R')
@@ -85,7 +85,7 @@ createRegionalPredictionHistoryMaps <- function(finalSample, movementMatrices, p
 	cl <- makeCluster(8, outfile="out.log")
 	registerDoParallel(cl)
 
-	foreach(idx=4:finalSample, .packages=c("aqfig", "raster", "doParallel", "foreach", "RColorBrewer"), .export=c("getData", "plotRisks", "plotMap", "seqRamp", "getColors")) %dopar% {
+	foreach(idx=4:finalSample, .packages=c("aqfig", "raster", "doParallel", "foreach", "RColorBrewer"), .export=c("getData", "plotRisks", "plotMap", "seqRamp", "getColors", "legendColors")) %dopar% {
 		source('diseaseMapping.R')
 		riskData <- getRiskData(movementMatrices, predictionModelNames, caseData, idx)
 		weighted_riskdata <- calculateWeightedRisks(riskData, aucmatrix[(idx-3):(idx-1),], FALSE)
