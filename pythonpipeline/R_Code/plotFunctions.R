@@ -55,23 +55,16 @@ plotRegionalRisks <- function(districts, countries, country_borders, predictedRe
 }
 
 plotCompositeLeaflet <- function(districts, riskList, ramp, regionNames) {
-	for(i in 1:12) {
+	riskCount <- length(riskList)
+	initialNames <- names(districts@data)
+	addedNames <- NULL
+	for(i in 1:riskCount) {
 		vals <- getVals(districts, riskList[[i]], ramp, regionNames)
 		
-		districts$risk <- vals
+		districts@data[length(initialNames)+i] <- vals
+		addedNames[i] <- paste(sep="", "risk", i)		
 	}
-	districts$risk1 <- getVals(districts, riskList[[1]], ramp, regionNames)
-	districts$risk2 <- getVals(districts, riskList[[2]], ramp, regionNames)
-	districts$risk3 <- getVals(districts, riskList[[3]], ramp, regionNames)
-	districts$risk4 <- getVals(districts, riskList[[4]], ramp, regionNames)
-	districts$risk5 <- getVals(districts, riskList[[5]], ramp, regionNames)
-	districts$risk6 <- getVals(districts, riskList[[6]], ramp, regionNames)
-	districts$risk7 <- getVals(districts, riskList[[7]], ramp, regionNames)
-	districts$risk8 <- getVals(districts, riskList[[8]], ramp, regionNames)
-	districts$risk9 <- getVals(districts, riskList[[9]], ramp, regionNames)
-	districts$risk10 <- getVals(districts, riskList[[10]], ramp, regionNames)
-	districts$risk11 <- getVals(districts, riskList[[11]], ramp, regionNames)
-	districts$risk12 <- getVals(districts, riskList[[12]], ramp, regionNames)
+	names(districts@data) <- c(initialNames, addedNames)
 	q.dat <- toGeoJSON(data=districts, name="weighted-districts")	
 }
 
