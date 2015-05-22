@@ -91,19 +91,7 @@ class Pipeline(object):
                         writer.writerow(newrow)
 
         output = call(["R", "--silent", "--slave", "--vanilla",
-                       "--file=" + os.path.abspath(rdir + "/regional_results/plotMap.R")], cwd=rdir + "/regional_results")
-
-        output = call(["R", "--silent", "--slave", "--vanilla",
-                       "--file=" + os.path.abspath(rdir + "/regional_results/plotWeightedMap.R")], cwd=rdir + "/regional_results")
-
-        output = call(["R", "--silent", "--slave", "--vanilla",
-                       "--file=" + os.path.abspath(rdir + "/global_results/plotMap.R")], cwd=rdir + "/global_results")
-
-        output = call(["R", "--silent", "--slave", "--vanilla",
-                       "--file=" + os.path.abspath(rdir + "/regional_case_history/createRegionalCaseHistoryPlots.R")], cwd=rdir + "/regional_case_history")
-
-        output = call(["R", "--silent", "--slave", "--vanilla",
-                       "--file=" + os.path.abspath(rdir + "/regional_prediction_history/createRegionalPredictionHistory.R")], cwd=rdir + "/regional_prediction_history")
+                       "--file=" + os.path.abspath(rdir + "process.R")], cwd=rdir)
 
         historycount = 0
 
@@ -112,8 +100,8 @@ class Pipeline(object):
             # WARNING: This needs to be run from a shell that can access a valid private key for the repository
             call(["git", "pull", "-v"], cwd=os.path.abspath(publishrepo))
             repopath = os.path.abspath(publishrepo)
-            os.chdir(os.path.abspath(rdir + "/regional_results"))
-            for file in glob.glob("*.png"):
+            os.chdir(os.path.abspath(rdir))
+            for file in glob.glob("regional*.png"):
                 filename = os.path.basename(file)
                 shutil.copy(file, repopath + "/images/" + filename)
                 call(["git", "add", repopath + "/images/" + filename], cwd=repopath)
@@ -131,24 +119,21 @@ class Pipeline(object):
 
             call(["git", "add", repopath + "/local-risk.md"], cwd=repopath)
 
-            shutil.copy(rcodedir + "/regional_results/weightings.csv", repopath + "/weightings.csv")
+            shutil.copy(rcodedir + "weightings.csv", repopath + "/weightings.csv")
 
             call(["git", "add", repopath + "/weightings.csv"], cwd=repopath)
 
-            os.chdir(os.path.abspath(rcodedir + "/global_results"))
-            for file in glob.glob("*.png"):
+            for file in glob.glob("global*.png"):
                 filename = os.path.basename(file)
                 shutil.copy(file, repopath + "/images/" + filename)
                 call(["git", "add", repopath + "/images/" + filename], cwd=repopath)
 
-            os.chdir(os.path.abspath(rcodedir + "/regional_case_history"))
             for file in glob.glob("*_cases_week.png"):
                 historycount += 1
                 filename = os.path.basename(file)
                 shutil.copy(file, repopath + "/images/cases/" + filename)
                 call(["git", "add", repopath + "/images/cases/" + filename], cwd=repopath)
 
-            os.chdir(os.path.abspath(rcodedir + "/regional_prediction_history"))
             for file in glob.glob("*.png"):
                 filename = os.path.basename(file)
                 shutil.copy(file, repopath + "/images/predictions/" + filename)
@@ -195,14 +180,14 @@ class Pipeline(object):
             call(["git", "add", repopath + "/prediction-history.md"], cwd=repopath)
 
             ## copy all geojson plots around
-            shutil.copy(rcodedir + "/regional_results/Regional_Risk/districts.geojson", repopath + "/geojson/Regional_Risk/districts.geojson")
-            shutil.copy(rcodedir + "/regional_results/weighted-districts.geojson", repopath + "/geojson/Regional_Risk_Source/districts.geojson")
-            shutil.copy(rcodedir + "/regional_results/Regional_Risk/Regional_Risk.html", repopath + "/geojson/Regional_Risk/Regional_Risk.html")
-            shutil.copy(rcodedir + "/global_results/global_Adjacency_prediction/global_Adjacency_prediction.html", repopath + "/geojson/global_Adjacency_prediction.html")
-            shutil.copy(rcodedir + "/global_results/global_Gravity_prediction/global_Gravity_prediction.html", repopath + "/geojson/global_Gravity_prediction.html")
-            shutil.copy(rcodedir + "/global_results/global_Migration_prediction/global_Migration_prediction.html", repopath + "/geojson/global_Migration_prediction.html")
-            shutil.copy(rcodedir + "/global_results/global_Overall_prediction/global_Overall_prediction.html", repopath + "/geojson/global_Overall_prediction.html")
-            shutil.copy(rcodedir + "/global_results/countries.geojson", repopath + "/geojson/countries.geojson")
+            shutil.copy(rcodedir + "/districts.geojson", repopath + "/geojson/Regional_Risk/districts.geojson")
+            shutil.copy(rcodedir + "/weighted-districts.geojson", repopath + "/geojson/Regional_Risk_Source/districts.geojson")
+            shutil.copy(rcodedir + "/Regional_Risk/Regional_Risk.html", repopath + "/geojson/Regional_Risk/Regional_Risk.html")
+            shutil.copy(rcodedir + "/global_Adjacency_prediction/global_Adjacency_prediction.html", repopath + "/geojson/global_Adjacency_prediction.html")
+            shutil.copy(rcodedir + "/global_Gravity_prediction/global_Gravity_prediction.html", repopath + "/geojson/global_Gravity_prediction.html")
+            shutil.copy(rcodedir + "/global_Migration_prediction/global_Migration_prediction.html", repopath + "/geojson/global_Migration_prediction.html")
+            shutil.copy(rcodedir + "/global_Overall_prediction/global_Overall_prediction.html", repopath + "/geojson/global_Overall_prediction.html")
+            shutil.copy(rcodedir + "/countries.geojson", repopath + "/geojson/countries.geojson")
             call(["git", "add", repopath + "/geojson/Regional_Risk/Regional_Risk.html"], cwd=repopath)
             call(["git", "add", repopath + "/geojson/Regional_Risk/districts.geojson"], cwd=repopath)
             call(["git", "add", repopath + "/geojson/Regional_Risk_Source/districts.geojson"], cwd=repopath)
@@ -214,7 +199,7 @@ class Pipeline(object):
 
             call(["git", "commit", "-m", "Updated WHO data and regional risk plots as of " + str(datetime.date.today())], cwd=repopath)
 
-            call(["git", "push", "-v"], cwd=repopath)
+            #call(["git", "push", "-v"], cwd=repopath)
 
     def downloadforcountry(self, countryname, outputdir):
         requestobject = model.WHORequestObject.WHORequestObject()
