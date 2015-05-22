@@ -3,6 +3,12 @@ require(leafletR)
 require(rgeos)
 require(RColorBrewer)
 
+getColors <- function(a, b, samples, vals, ramp) {
+	col_range <- seq(a, b, length.out = samples)
+	cols <- ramp(samples)  
+	bins <- cut(vals, col_range, include.lowest = TRUE)
+	return(cols[bins])
+}
 
 plotRegionalMap <- function (vals,
                      districts,
@@ -16,11 +22,7 @@ plotRegionalMap <- function (vals,
 					 dir_name=NA,
 					 leaflet) {
   # get the colours
-  col_range <- seq(zlim[1], zlim[2], length.out = n)
-  cols <- ramp(n)
-  
-  bins <- cut(vals, col_range, include.lowest = TRUE)
-  regionColours <- cols[bins]
+  regionColours <- getColors(zlim[1], zlim[2], n, vals, ramp)
   
   regionColours[paste(districts$COUNTRY_ID,districts$NAME, sep='_') %in% names(reportedCases)] <- "#33D3FF"
   
@@ -113,12 +115,7 @@ plotGlobalMap <- function (vals,
 					 dir_name=NA,
 					 filename) {
   # get the colours
-  col_range <- seq(zlim[1], zlim[2], length.out = n)
-  cols <- ramp(n)
-  
-  bins <- cut(vals, col_range, include.lowest = TRUE)
-  
-  countryColors <- cols[bins]
+  countryColors <- getColors(zlim[1], zlim[2], n, vals, ramp)
   # special cases for LBR, SLE and GIN
   countryColors[grep("LBR|GIN|SLE", countries$admin0_COU)] <- "#33D3FF"
   countryColors[is.na(countryColors)] <- grey(0.9)
@@ -213,11 +210,7 @@ plotHistoricCaseMap <- function (vals,
 					 reportedCases,
 					 plotTitle) {
 # get the colours
-  col_range <- seq(zlim[1], zlim[2], length.out = n)
-  cols <- ramp(n)
-  
-  bins <- cut(vals, col_range, include.lowest = TRUE)
-  regionColours <- cols[bins]
+  regionColours <- getColors(zlim[1], zlim[2], n, vals, ramp)
 
   newbins <- cut(log(reportedCases), col_range, include.lowest = TRUE)
   newcols <- cols[newbins]
@@ -246,11 +239,7 @@ plotMap <- function (vals,
   # optional range of the colours, plot a map of the values with a nice legend.
   
   # get the colours
-  col_range <- seq(zlim[1], zlim[2], length.out = n)
-  cols <- ramp(n)
-  
-  bins <- cut(vals, col_range, include.lowest = TRUE)
-  regionColours <- cols[bins]
+  regionColours <- getColors(zlim[1], zlim[2], n, vals, ramp)
   
   regionColours[paste(districts$COUNTRY_ID,districts$NAME, sep='_') %in% names(reportedCases)] <- grey(0.7)
   
