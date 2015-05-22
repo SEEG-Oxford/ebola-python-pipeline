@@ -182,12 +182,12 @@ getSimpleData <- function(sampleOfInterest, allCaseData) {
 ###################################################
 
 
-## Descrete integration for AUC calc
+## Discrete integration for AUC calc
 ## ?x.y1 + 1/2?x.?y  <- summation of trapezoids
 desc_integrate<-function(x,y)
 {
    f<-cbind(x,y)
-   ## Sort by x, then by y (assending)
+   ## Sort by x, then by y (ascending)
    f<-f[order(f[,1],f[,2]),] 
    dint<-0
    x<-f[,1]
