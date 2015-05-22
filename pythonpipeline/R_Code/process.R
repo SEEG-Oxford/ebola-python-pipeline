@@ -4,12 +4,10 @@ require(SDMTools)
 require(rgdal)
 require(foreach)
 require(doParallel)
-require(aqfig)
 require(abind)
 
 # load required helper functions
 print("Loading helper functions")
-source('plotFunctions.R')
 source('diseaseMapping.R')
 
 # load shapefiles

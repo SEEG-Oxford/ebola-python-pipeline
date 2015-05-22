@@ -91,7 +91,7 @@ class Pipeline(object):
                         writer.writerow(newrow)
 
         output = call(["R", "--silent", "--slave", "--vanilla",
-                       "--file=" + os.path.abspath(rdir + "process.R")], cwd=rdir)
+                       "--file=" + os.path.abspath(rdir + "/process.R")], cwd=rdir)
 
         historycount = 0
 
