@@ -113,10 +113,10 @@ stopCluster(cl)
 
 print("Plotting regional results")
 riskData <- getRiskData(movementMatrices, predictionModelNames[1:12], allcasedata, mostRecent)
-plotAllRegionalRisks(riskData, districts, countries, country_borders, regionalRiskTitles)
+plotAllRegionalRisks(riskData, districts, countries, country_borders, regionalRiskTitles, paste(districts$COUNTRY_ID,districts$NAME, sep='_'), seqRamp('YlOrRd'))
 africaRiskData <- getRiskData(abind(as.movementmatrix(west_africa_gravity[,c(8,14,19)]), along=3), predictionModelNames[13], allcasedata, mostRecent)
-plotAllRegionalRisks(africaRiskData, districts, countries, country_borders, regionalRiskTitles[13])
-plotCompositeLeaflet(districts, riskData)
+plotAllRegionalRisks(africaRiskData, districts, countries, country_borders, regionalRiskTitles[13], paste(districts$COUNTRY_ID,districts$NAME, sep='_'), seqRamp('YlOrRd'))
+plotCompositeLeaflet(districts, riskData, seqRamp('YlOrRd'), paste(districts$COUNTRY_ID,districts$NAME, sep='_'))
 
 print("Plotting weighted regional results")
 aucmatrix <- calculateAUCMatrix(movementMatrices, predictionModelNames[1:12], allcasedata, mostRecent)
@@ -126,7 +126,7 @@ aucmatrix <- calculateAUCMatrix(movementMatrices, predictionModelNames[1:12], al
 colnames(aucmatrix) <- c("Week index", predictionModelNames[1:12])
 #write.csv(aucmatrix, "aucdata.csv")
 weighted_riskdata <- calculateWeightedRisks(riskData, tail(aucmatrix,3))
-plotRegionalRisks(districts, countries, country_borders, weighted_riskdata, riskData[[1]]$reportedCases, "Regional relative risk of Ebola importation\n using weighted prediction model data", "regional_prediction_weighted", leaflet=TRUE)
+plotRegionalRisks(districts, countries, country_borders, weighted_riskdata, riskData[[1]]$reportedCases, "Regional relative risk of Ebola importation\n using weighted prediction model data", "regional_prediction_weighted", paste(districts$COUNTRY_ID,districts$NAME, sep='_'), seqRamp('YlOrRd'), leaflet=TRUE)
 
 print("Plotting global risk map")
 # this calculation is currently ebola specific
@@ -139,9 +139,9 @@ plotGlobalRisks(data.frame(country=countrycodes, risk=globalRisks$gravity_relati
 plotGlobalRisks(data.frame(country=countrycodes, risk=globalRisks$migration_relative), informCountries, allCountries, "global_Migration_prediction", "Global relative risk of Ebola importation\n from Migration model")
 
 print("Plotting regional case history maps")
-createRegionalCaseHistoryMaps(allcasedata, districts, countries, country_borders, mostRecent)
+createRegionalCaseHistoryMaps(allcasedata, districts, countries, country_borders, mostRecent, paste(districts$COUNTRY_ID,districts$NAME, sep='_'), colorRampPalette(c("#fcbba1","#fc9272","#fb6a4a","#ef3b2c","#cb181d","#a50f15","#67000d")))
 
 print("Plotting regional prediction history maps")
-createRegionalPredictionHistoryMaps(mostRecent, movementMatrices, predictionModelNames[1:12], allcasedata, districts, countries, country_borders, aucmatrix)
+createRegionalPredictionHistoryMaps(mostRecent, movementMatrices, predictionModelNames[1:12], allcasedata, districts, countries, country_borders, aucmatrix, paste(districts$COUNTRY_ID,districts$NAME, sep='_'), seqRamp('YlOrRd'))
 
 print("Done")

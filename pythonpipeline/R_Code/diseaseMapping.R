@@ -11,10 +11,10 @@ getRiskData <- function(movementMatrices, predictionModelNames, caseData, sample
 	return(riskData)
 }
 
-plotAllRegionalRisks <- function(riskData, districts, countries, country_borders, regionalRiskTitles) {
+plotAllRegionalRisks <- function(riskData, districts, countries, country_borders, regionalRiskTitles, regionNames, ramp) {
 	riskModelCount <- length(riskData)
 	for (i in 1:riskModelCount) {
-		plotRegionalRisks(districts, countries, country_borders, riskData[[i]]$predictedRegions, riskData[[i]]$reportedCases, regionalRiskTitles[i], paste(sep='_', "regional_prediction", riskData[[i]]$name), FALSE)
+		plotRegionalRisks(districts, countries, country_borders, riskData[[i]]$predictedRegions, riskData[[i]]$reportedCases, regionalRiskTitles[i], paste(sep='_', "regional_prediction", riskData[[i]]$name), regionNames, ramp, FALSE)
 	}
 }
 
@@ -67,7 +67,7 @@ calculateWeightedRisks <- function(riskData, aucs, outfile=TRUE) {
 	return(weighted_riskdata)
 }
 
-createRegionalCaseHistoryMaps <- function(caseData, districts, countries, country_borders, finalSample) {
+createRegionalCaseHistoryMaps <- function(caseData, districts, countries, country_borders, finalSample, regionNames, ramp) {
 	cl <- makeCluster(8, outfile="out.log")
 	registerDoParallel(cl)
 
@@ -76,12 +76,12 @@ createRegionalCaseHistoryMaps <- function(caseData, districts, countries, countr
 		formattedDate <- format(as.POSIXct(rawdate, format="%Y %U %u"), format="%B %d %Y")
 		source('plotFunctions.R')
 		plotDate(formattedDate, filename=paste(formatC(idx, width=2, flag="0"), "date", sep="_"))
-		plotHistoricCases(districts, countries, country_borders, 0, getSimpleData(idx, caseData), plotTitle="", filename=paste(formatC(idx, width=2, flag="0"), "regional_cases_week", sep="_"), max(log(caseData[,-1])))
+		plotHistoricCases(districts, countries, country_borders, 0, getSimpleData(idx, caseData), plotTitle="", filename=paste(formatC(idx, width=2, flag="0"), "regional_cases_week", sep="_"), max(log(caseData[,-1])), regionNames, ramp)
 	}
 	stopCluster(cl)
 }
 
-createRegionalPredictionHistoryMaps <- function(finalSample, movementMatrices, predictionModelNames, caseData, districts, countries, country_borders, aucmatrix) {
+createRegionalPredictionHistoryMaps <- function(finalSample, movementMatrices, predictionModelNames, caseData, districts, countries, country_borders, aucmatrix, regionNames, ramp) {
 	cl <- makeCluster(8, outfile="out.log")
 	registerDoParallel(cl)
 
@@ -91,7 +91,7 @@ createRegionalPredictionHistoryMaps <- function(finalSample, movementMatrices, p
 		weighted_riskdata <- calculateWeightedRisks(riskData, aucmatrix[(idx-3):(idx-1),], FALSE)
 
 		# plot
-		plotRisks(districts, countries, country_borders, weighted_riskdata, riskData[1][[1]]$reportedCases, plotTitle="", filename=paste(formatC(idx, width=2, flag="0"), "regional_prediction_weighted", sep="_"))
+		plotRisks(districts, countries, country_borders, weighted_riskdata, riskData[1][[1]]$reportedCases, plotTitle="", filename=paste(formatC(idx, width=2, flag="0"), "regional_prediction_weighted", sep="_"), regionNames, ramp)
 	}
 	stopCluster(cl)
 }

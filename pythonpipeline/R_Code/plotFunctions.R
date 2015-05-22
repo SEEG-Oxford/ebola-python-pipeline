@@ -18,14 +18,14 @@ plotLeafletMap <- function(vals, districts, dirName, regionColours) {
 	q.map
 }
 
-plotRegionalRisks <- function(districts, countries, country_borders, predictedRegions, reportedCases, plotTitle, filename, leaflet=FALSE) {
+plotRegionalRisks <- function(districts, countries, country_borders, predictedRegions, reportedCases, plotTitle, filename, regionNames, ramp, leaflet=FALSE) {
 	vals <- rep(NA, nrow(districts))
 	for(idx in 1:length(predictedRegions)) {	
-		vals[match(names(predictedRegions[idx]), paste(districts$COUNTRY_ID,districts$NAME, sep='_'))] <- predictedRegions[idx]
+		vals[match(names(predictedRegions[idx]), regionNames)] <- predictedRegions[idx]
 	}
-	regionColours <- getColors(0, 1, 1000, vals, seqRamp('YlOrRd'))  
-	regionColours[paste(districts$COUNTRY_ID,districts$NAME, sep='_') %in% names(reportedCases)] <- "#33D3FF"
-	legendColors <- seqRamp('YlOrRd')(1000)
+	regionColours <- getColors(0, 1, 1000, vals, ramp)  
+	regionColours[regionNames %in% names(reportedCases)] <- "#33D3FF"
+	legendColors <- ramp(1000)
 	legendRange <- c(0,1)	
 	
 	newfilename <- paste(filename, ".png", sep="")
@@ -54,35 +54,35 @@ plotRegionalRisks <- function(districts, countries, country_borders, predictedRe
 	dev.off()
 }
 
-plotCompositeLeaflet <- function(districts, riskList) {
+plotCompositeLeaflet <- function(districts, riskList, ramp, regionNames) {
 	for(i in 1:12) {
-		vals <- getVals(districts, riskList[[i]])
+		vals <- getVals(districts, riskList[[i]], ramp, regionNames)
 		
 		districts$risk <- vals
 	}
-	districts$risk1 <- getVals(districts, riskList[[1]])
-	districts$risk2 <- getVals(districts, riskList[[2]])
-	districts$risk3 <- getVals(districts, riskList[[3]])
-	districts$risk4 <- getVals(districts, riskList[[4]])
-	districts$risk5 <- getVals(districts, riskList[[5]])
-	districts$risk6 <- getVals(districts, riskList[[6]])
-	districts$risk7 <- getVals(districts, riskList[[7]])
-	districts$risk8 <- getVals(districts, riskList[[8]])
-	districts$risk9 <- getVals(districts, riskList[[9]])
-	districts$risk10 <- getVals(districts, riskList[[10]])
-	districts$risk11 <- getVals(districts, riskList[[11]])
-	districts$risk12 <- getVals(districts, riskList[[12]])
+	districts$risk1 <- getVals(districts, riskList[[1]], ramp, regionNames)
+	districts$risk2 <- getVals(districts, riskList[[2]], ramp, regionNames)
+	districts$risk3 <- getVals(districts, riskList[[3]], ramp, regionNames)
+	districts$risk4 <- getVals(districts, riskList[[4]], ramp, regionNames)
+	districts$risk5 <- getVals(districts, riskList[[5]], ramp, regionNames)
+	districts$risk6 <- getVals(districts, riskList[[6]], ramp, regionNames)
+	districts$risk7 <- getVals(districts, riskList[[7]], ramp, regionNames)
+	districts$risk8 <- getVals(districts, riskList[[8]], ramp, regionNames)
+	districts$risk9 <- getVals(districts, riskList[[9]], ramp, regionNames)
+	districts$risk10 <- getVals(districts, riskList[[10]], ramp, regionNames)
+	districts$risk11 <- getVals(districts, riskList[[11]], ramp, regionNames)
+	districts$risk12 <- getVals(districts, riskList[[12]], ramp, regionNames)
 	q.dat <- toGeoJSON(data=districts, name="weighted-districts")	
 }
 
-getVals <- function(districts, risk) {
+getVals <- function(districts, risk, ramp, regionNames) {
 	col_range <- seq(0, 1, length.out = 1000)
-	cols <- seqRamp('YlOrRd')(1000)
+	cols <- ramp(1000)
 	vals <- rep(NA, nrow(districts))
 	predictedRegions <- risk$predictedRegions
 	reportedCases <- risk$reportedCases
 	for(idx in 1:length(predictedRegions)) {	
-		vals[match(names(predictedRegions[idx]), paste(districts$COUNTRY_ID,districts$NAME, sep='_'))] <- predictedRegions[idx]
+		vals[match(names(predictedRegions[idx]), regionNames)] <- predictedRegions[idx]
 	}
 	return(vals)
 }
@@ -165,17 +165,15 @@ plotDate <- function(datestring, filename) {
 	par(mar = c(5, 4, 4, 2) + 0.1)
 }
 
-plotHistoricCases <- function(districts, countries, country_borders, predictedRegions, reportedCases, plotTitle, filename, upperLimit) {
+plotHistoricCases <- function(districts, countries, country_borders, predictedRegions, reportedCases, plotTitle, filename, upperLimit, regionNames, ramp) {
 	vals <- rep(NA, nrow(districts))
 	for(idx in 1:length(predictedRegions)) {	
-		vals[match(names(predictedRegions[idx]), paste(districts$COUNTRY_ID,districts$NAME, sep='_'))] <- predictedRegions[idx]
+		vals[match(names(predictedRegions[idx]), regionNames)] <- predictedRegions[idx]
 	}
 	
-	redPalette <- colorRampPalette(c("#fcbba1","#fc9272","#fb6a4a","#ef3b2c","#cb181d","#a50f15","#67000d"))
-	
-	regionColours <- getColors(0, upperLimit, 1000, vals, redPalette)  
-	regionColours[paste(districts$COUNTRY_ID,districts$NAME, sep='_') %in% names(reportedCases)] <- grey(0.7)
-	legendColors <- redPalette(1000)
+	regionColours <- getColors(0, upperLimit, 1000, vals, ramp)  
+	regionColours[regionNames %in% names(reportedCases)] <- grey(0.7)
+	legendColors <- ramp(1000)
 	legendRange <- c(0,upperLimit)
 	
 	png(filename=paste(filename, ".png", sep=""), width=800, height=700, units='px', pointsize=20)
@@ -204,15 +202,15 @@ plotMap <- function (districts,
   title(main=plotTitle)  
 }
 
-plotRisks <- function(districts, countries, country_borders, predictedRegions, reportedCases, plotTitle, filename) {
+plotRisks <- function(districts, countries, country_borders, predictedRegions, reportedCases, plotTitle, filename, regionNames, ramp) {
 	vals <- rep(NA, nrow(districts))
 	for(idx in 1:length(predictedRegions)) {	
-		vals[match(names(predictedRegions[idx]), paste(districts$COUNTRY_ID,districts$NAME, sep='_'))] <- predictedRegions[idx]
+		vals[match(names(predictedRegions[idx]), regionNames)] <- predictedRegions[idx]
 	}
 	
-	regionColours <- getColors(0, 1, 1000, vals, seqRamp('YlOrRd'))  
-	regionColours[paste(districts$COUNTRY_ID,districts$NAME, sep='_') %in% names(reportedCases)] <- grey(0.7)
-	legendColors <- seqRamp('YlOrRd')(1000)
+	regionColours <- getColors(0, 1, 1000, vals, ramp)  
+	regionColours[regionNames %in% names(reportedCases)] <- grey(0.7)
+	legendColors <- ramp(1000)
 	legendRange <- c(0,1)
 	
 	png(filename=paste(filename, ".png", sep=""), width=800, height=700, units='px', pointsize=20)
