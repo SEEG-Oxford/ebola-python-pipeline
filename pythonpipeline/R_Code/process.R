@@ -10,7 +10,6 @@ require(abind)
 # load required helper functions
 print("Loading helper functions")
 source('plotFunctions.R')
-source('palettes.R')
 source('diseaseMapping.R')
 
 # load shapefiles

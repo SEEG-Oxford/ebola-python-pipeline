@@ -1,7 +1,8 @@
 require(aqfig)
 require(leafletR)
 require(rgeos)
-source('palettes.R')
+require(RColorBrewer)
+
 
 plotRegionalMap <- function (vals,
                      districts,
@@ -276,4 +277,42 @@ plotRisks <- function(districts, countries, country_borders, predictedRegions, r
 			reportedCases = reportedCases,
 			plotTitle = plotTitle)
 	dev.off()
+}
+
+# convert an RColorBrewer div palette into a colour ramp
+divRamp <- function(name = c("Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu",
+                             "PuOr", "PRGn", "PiYG", "BrBG")) {
+  
+  # match the name
+  name <- match.arg(name)
+  
+  # fetch the palette
+  pal <- brewer.pal(n = 11, name = name)
+  
+  # convert to a ramp
+  ramp <- colorRampPalette(pal)
+  
+  # return this
+  return (ramp)
+  
+}
+
+# convert an RColorBrewer seq palette into a colour ramp
+seqRamp <- function(name = c("YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds",
+                             "RdPu", "Purples", "PuRd", "PuBuGn", "PuBu",
+                             "OrRd", "Oranges", "Greys", "Greens", "GnBu",
+                             "BuPu", "BuGn", "Blues")) {
+  
+  # match the name
+  name <- match.arg(name)
+  
+  # fetch the palette
+  pal <- brewer.pal(n = 9, name = name)
+  
+  # convert to a ramp
+  ramp <- colorRampPalette(pal)
+  
+  # return this
+  return (ramp)
+  
 }
