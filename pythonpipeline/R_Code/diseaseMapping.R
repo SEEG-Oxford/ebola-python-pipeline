@@ -75,16 +75,9 @@ calculateWeightedRisks <- function(riskData, aucs, outfile=TRUE) {
 }
 
 createRegionalCaseHistoryMaps <- function(caseData, districts, countries, country_borders, finalSample, regionNames, ramp) {
-	cl <- makeCluster(8, outfile="out.log")
-	registerDoParallel(cl)
-
-	foreach(idx=1:finalSample,.packages=c("aqfig"),.export=c("getSimpleData", "plotRisks", "plotMap", "seqRamp", "getColors", "plotDate", "plotHistoricCases")) %dopar% {
-		rawdate <- paste(gsub("-W", " ", as.character(caseData[idx,1])), "1", sep=" ")
-		formattedDate <- format(as.POSIXct(rawdate, format="%Y %U %u"), format="%B %d %Y")
-		plotDate(formattedDate, filename=paste(formatC(idx, width=2, flag="0"), "date", sep="_"))
+	foreach(idx=1:finalSample,.packages=c("aqfig"),.export=c("getSimpleData", "plotRisks", "plotMap", "seqRamp", "getColors", "plotDate", "plotHistoricCases")) %do% {
 		plotHistoricCases(districts, countries, country_borders, 0, getSimpleData(idx, caseData), plotTitle="", filename=paste(formatC(idx, width=2, flag="0"), "regional_cases_week", sep="_"), max(log(caseData[,-1])), regionNames, ramp)
 	}
-	stopCluster(cl)
 }
 
 createRegionalPredictionHistoryMaps <- function(finalSample, movementMatrices, predictionModelNames, caseData, districts, countries, country_borders, aucmatrix, regionNames, ramp) {
@@ -452,12 +445,11 @@ plotHistoricCases <- function(districts, countries, country_borders, predictedRe
 	for(idx in 1:length(predictedRegions)) {	
 		vals[match(names(predictedRegions[idx]), regionNames)] <- predictedRegions[idx]
 	}
-	
 	regionColours <- getColors(0, upperLimit, 1000, vals, ramp)  
 	regionColours[regionNames %in% names(reportedCases)] <- grey(0.7)
 	legendColors <- ramp(1000)
 	legendRange <- c(0,upperLimit)
-	
+
 	png(filename=paste(filename, ".png", sep=""), width=800, height=700, units='px', pointsize=20)
 	plotMap(districts,
 			countries,
@@ -481,7 +473,7 @@ plotMap <- function (districts,
   plot(districts, col = objectColors, border = 'white', add = TRUE)
   plot(country_borders, col = grey(0.4), add = TRUE)
   vertical.image.legend(col=legendColors,zlim=legendRange)
-  title(main=plotTitle)  
+  title(main=plotTitle)
 }
 
 plotRisks <- function(districts, countries, country_borders, predictedRegions, reportedCases, plotTitle, filename, regionNames, ramp) {
@@ -489,7 +481,6 @@ plotRisks <- function(districts, countries, country_borders, predictedRegions, r
 	for(idx in 1:length(predictedRegions)) {	
 		vals[match(names(predictedRegions[idx]), regionNames)] <- predictedRegions[idx]
 	}
-	
 	regionColours <- getColors(0, 1, 1000, vals, ramp)  
 	regionColours[regionNames %in% names(reportedCases)] <- grey(0.7)
 	legendColors <- ramp(1000)
