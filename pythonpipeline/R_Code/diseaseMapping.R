@@ -312,15 +312,13 @@ plotRegionalRisks <- function(districts, countries, country_borders, predictedRe
 	
 	newfilename <- paste(filename, ".png", sep="")
 	png(filename=newfilename, width=800, height=700, units='px', pointsize=20)
-	if(leaflet) {
-		plotMap(districts,
-				countries,
-				country_borders,
-				plotTitle,
-				regionColours,
-				legendColors,
-				legendRange)
-	}
+	plotMap(districts,
+			countries,
+			country_borders,
+			plotTitle,
+			regionColours,
+			legendColors,
+			legendRange)
 	dev.off()
 	if(leaflet) {
 		plotLeafletMap(vals, districts, dirname(newfilename), regionColours)
