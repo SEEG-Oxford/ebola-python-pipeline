@@ -119,7 +119,7 @@ class Pipeline(object):
 
             call(["git", "add", repopath + "/local-risk.md"], cwd=repopath)
 
-            shutil.copy(rcodedir + "weightings.csv", repopath + "/weightings.csv")
+            shutil.copy(rcodedir + "/weightings.csv", repopath + "/weightings.csv")
 
             call(["git", "add", repopath + "/weightings.csv"], cwd=repopath)
 
@@ -134,7 +134,7 @@ class Pipeline(object):
                 shutil.copy(file, repopath + "/images/cases/" + filename)
                 call(["git", "add", repopath + "/images/cases/" + filename], cwd=repopath)
 
-            for file in glob.glob("*.png"):
+            for file in glob.glob("*regional_prediction_weighted.png"):
                 filename = os.path.basename(file)
                 shutil.copy(file, repopath + "/images/predictions/" + filename)
                 call(["git", "add", repopath + "/images/predictions/" + filename], cwd=repopath)
@@ -199,7 +199,7 @@ class Pipeline(object):
 
             call(["git", "commit", "-m", "Updated WHO data and regional risk plots as of " + str(datetime.date.today())], cwd=repopath)
 
-            #call(["git", "push", "-v"], cwd=repopath)
+            call(["git", "push", "-v"], cwd=repopath)
 
     def downloadforcountry(self, countryname, outputdir):
         requestobject = model.WHORequestObject.WHORequestObject()
