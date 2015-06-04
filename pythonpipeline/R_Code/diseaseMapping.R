@@ -5,6 +5,14 @@ require(RColorBrewer)
 require(foreach)
 require(doParallel)
 
+#' Gets risk data for a given set of risk models, case data
+#'
+#' Use a pre-calculated set of movement matrices, and a set of observed measurements matching those
+#' movement matrices to calculate the risk of importation into each region.
+#' @param movementMatrices A list of movement matrices from different movement models
+#' @param predictionModelNames The names of the prediction models used to generate the movementMatrices
+#' @param caseData A matrix of observed case data with columns denoting regions and rows denoting sample numbers (in the case of ebola data, week numbers)
+#' @return A list of risk data for each region
 getRiskData <- function(movementMatrices, predictionModelNames, caseData, sampleOfInterest) {
 	# work out how many risk models we have to deal with
 	riskModelCount <- dim(movementMatrices)[3]
@@ -18,6 +26,15 @@ getRiskData <- function(movementMatrices, predictionModelNames, caseData, sample
 	return(riskData)
 }
 
+#' Plots regional risk maps
+#'
+#' @param riskData The list of risks for each region
+#' @param districts A SpatialPolygonsDataFrame containing the districts of interest
+#' @param countries A SpatialPolygonsDataFrame containing the countries of interest
+#' @param country_borders A SpatialPolygonsDataFrame containing the borders of the countries of interest
+#' @param regionalRiskTitles A list of titles for each plot
+#' @param regionNames The list of region names being plotted
+#' @param ramp A color ramp function to use when plotting the risk
 plotAllRegionalRisks <- function(riskData, districts, countries, country_borders, regionalRiskTitles, regionNames, ramp) {
 	riskModelCount <- length(riskData)
 	for (i in 1:riskModelCount) {
